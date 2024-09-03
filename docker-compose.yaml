@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    stdin_open: true
+    tty: true
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Maps the container's port 8080 to host port 5000
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - sqlserver
+    networks:
+      - app-network
+
+  sqlserver:
+    build:
+        context: ./Persistence
+        dockerfile: Dockerfile
+    ports:
+      - "1433:1433" # Expose SQL Server port
+    volumes:
+      - sqlserver-data:/var/opt/mssql # Persist SQL Server data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  sqlserver-data:
+    driver: local
