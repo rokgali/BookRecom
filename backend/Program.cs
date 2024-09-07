@@ -1,9 +1,14 @@
 using backend.persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using backend.models.database;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("myserverconnection");
+
+builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<BookRecomDbContext>();
 
 builder.Services.AddDbContext<BookRecomDbContext>(options => {
     options.UseSqlServer(connectionString);
