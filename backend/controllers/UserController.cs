@@ -1,18 +1,24 @@
+using backend.services.gemini;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.controllers
 {
     [ApiController]
+    [Route("api/[controller]/[action]")]
     public class UserController : ControllerBase
     {
-        public UserController()
+        private readonly IGeminiClient _geminiClient;
+        public UserController(IGeminiClient geminiClient)
         {
-
+            _geminiClient = geminiClient;
         }
 
-        public async Task<IActionResult> UserTestThing()
+        [HttpGet]
+        public async Task<IActionResult> UserTestThing(CancellationToken ct)
         {
-            return Ok("Test thing work");
+            string generatedGeminiJson = await _geminiClient.GenerateContentAsync("what is dog", ct);
+
+            return Ok(generatedGeminiJson);
         }
     }
 }

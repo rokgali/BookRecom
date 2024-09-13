@@ -1,7 +1,7 @@
 namespace backend.models.database
 {
     public enum BookStatus {
-        Recommended,
+        InLibrary,
         InProgress,
         Finished
     }
