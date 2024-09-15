@@ -18,8 +18,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    # volumes:
+    #   - ./backend:/app
     ports:
-      - "8080:8080" # Maps the container's port 8080 to host port 5000
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
@@ -27,14 +29,15 @@ services:
     networks:
       - app-network
 
-  sqlserver:
+  sqlserver: 
+    hostname: mssql-db
     build:
         context: ./Persistence
         dockerfile: Dockerfile
     ports:
-      - "1433:1433" # Expose SQL Server port
+      - "1433:1433"
     volumes:
-      - sqlserver-data:/var/opt/mssql # Persist SQL Server data
+      - sqlserver-data:/var/opt/mssql
     networks:
       - app-network
 

@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "C#: backend [http]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/backend/backend.csproj",
+            "launchConfigurationId": "TargetFramework=;http"
+        }
+    ]
+}

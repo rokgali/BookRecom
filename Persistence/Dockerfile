@@ -1,3 +1,6 @@
+# docker exec -it <container_id> /bin/bash
+# /opt/mssql-tools18/bin/sqlcmd -S mssql-db,1433 -U sa -P 'StrongPass!123' -C
+
 # Use the official Microsoft SQL Server image from the Microsoft Container Registry
 FROM mcr.microsoft.com/mssql/server:2022-latest
 
