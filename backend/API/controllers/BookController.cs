@@ -4,12 +4,14 @@ using backend.models.dto.create;
 using backend.persistence;
 using backend.services;
 using backend.services.gemini;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class BookController : ControllerBase
     {

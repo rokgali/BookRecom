@@ -11,7 +11,8 @@ var connectionString = builder.Configuration.GetConnectionString("myserverconnec
 
 builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<BookRecomDbContext>();
+    .AddEntityFrameworkStores<BookRecomDbContext>()
+    .AddApiEndpoints();
 
 builder.Services.AddDbContext<BookRecomDbContext>(options => {
     options.UseSqlServer(connectionString);
@@ -20,6 +21,11 @@ builder.Services.AddDbContext<BookRecomDbContext>(options => {
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication()
+    .AddBearerToken(IdentityConstants.BearerScheme);
+
+builder.Services.AddAuthorizationBuilder();
 
 builder.Services.Configure<IdentityOptions>(options => {
     options.Password.RequireDigit = false;
@@ -46,6 +52,8 @@ builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+app.MapIdentityApi<User>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
