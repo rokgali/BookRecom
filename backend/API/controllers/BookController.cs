@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.models.database;
 using backend.models.dto.create;
+using backend.models.dto.get;
 using backend.persistence;
 using backend.services;
 using backend.services.gemini;
@@ -11,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.controllers
 {
     [ApiController]
-    [Authorize]
+    // [Authorize]
     [Route("api/[controller]/[action]")]
     public class BookController : ControllerBase
     {
@@ -46,6 +47,22 @@ namespace backend.controllers
             // int addBookToUser = await _bookService.AddBookToUser(newBook, )
 
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DescribeBook([FromQuery]BookDecriptionDTO bookDescriptionDTO, CancellationToken ct)
+        {
+            string initialPrompt = "Hello, please give me a short summary of this book." +
+                                     "The title of the book is " + bookDescriptionDTO.Title + 
+                                     " and the name of the author is " + bookDescriptionDTO.Author;
+
+            try {
+                string description = await _geminiClient.GenerateContentAsync(initialPrompt, ct);
+
+                return Ok(description);
+            } catch {
+                throw;
+            }
         }
     }
 }

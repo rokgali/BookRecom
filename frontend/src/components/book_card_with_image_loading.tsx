@@ -16,9 +16,6 @@ export default function BookCardWithImageLoading(props: Book_card_props)
     }, [imageURL])
 
     return (<>
-        {failedToLoadImageError && 
-            <div className="text-red-500 font-bold text-lg mx-auto w-auto">{failedToLoadImageError}</div>
-        }
         {imageLoaded && (
                 <BookCard title={props.title} imageURL={props.imageURL} />
         )}

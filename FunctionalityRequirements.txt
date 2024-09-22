@@ -1,8 +1,11 @@
-"Book page" - in this context is website page that opens when you click on book from book library
+-- Select a book to receive a books description
+-- User clicking on book saves It's data to database
+-- A list of main points of the book is listed for the user
+to read and saved in the database so the prompt doesn't need
+to be recreated.
+-- Administrator can manually add characters that chat-bot can 	  imitate
+-- User can have a conversation with the books characters
 
--- User selects a book that he has read, book is added to read books tab
--- Dashboard displays last book read, how long ago, recommendations for next read
--- User can write main ideas in book page
--- In book page user sees books worth reading that are similar to selected book
--- Pressing on book opens up page that displays key book ideas
--- Dashboard displays mains ideas from entirety of book library
+
+
+
