@@ -5,6 +5,7 @@ using backend.models.database;
 using backend.services.gemini;
 using backend.services;
 using backend.services.book;
+using backend.services.jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("myserverconnection");
@@ -48,6 +49,9 @@ builder.Services.AddTransient<IGeminiClient, GeminiClient>();
 builder.Services.AddHttpClient<GeminiClient>();
 
 builder.Services.AddTransient<IBookService, BookService>();
+
+builder.Services.AddTransient<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddHostedService<BackgroundJobService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

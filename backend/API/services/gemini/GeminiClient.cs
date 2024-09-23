@@ -19,7 +19,7 @@ namespace backend.services.gemini
             _configuration = configuration;
         }
 
-        public async Task<string> GenerateContentAsync(string prompt, CancellationToken cancellationToken)
+        public async Task<string> GenerateContentAsync(string prompt, string model, CancellationToken cancellationToken)
         {
             var requestBody = GeminiRequestFactory.CreateRequest(prompt);
             var content = new StringContent(JsonSerializer.Serialize(requestBody, 
@@ -27,8 +27,10 @@ namespace backend.services.gemini
 
             var apiKey = _configuration["Gemini:ApiKey"];
             var url = _configuration["Gemini:Url"];
+            // gemini-1.5-flash-latest:generateContent
+            // tunedModels/main-book-takeaways-5t3yvgirtmuh:generateContent
 
-            var request = new HttpRequestMessage(HttpMethod.Post, url + "?key=" + apiKey)
+            var request = new HttpRequestMessage(HttpMethod.Post, url + model + "?key=" + apiKey)
             {
                 Content = content
             };

@@ -9,6 +9,9 @@ namespace backend.persistence
     {
         public DbSet<Book> Books {get; set;}
         public DbSet<UserBook> UserBooks {get;set;}
+        public DbSet<BookChangeHistory> BookChangeHistory {get;set;}
+        public DbSet<Takeaway> Takeaway {get;set;}
+        public DbSet<Takeaways> Takeaways { get; set; }
         public BookRecomDbContext(DbContextOptions<BookRecomDbContext> options) : base(options)
         {
 
@@ -36,6 +39,17 @@ namespace backend.persistence
                    .HasForeignKey(ub => ub.BookId);
 
             // -------------------------------------
+
+            builder.Entity<Book>()
+            .HasIndex(b => b.WorkId)
+            .IsUnique();
+
+            // -------------------------------------
+
+            builder.Entity<Book>()
+            .HasOne<Takeaways>(b => b.TakeAways)
+            .WithOne(t => t.Book)
+            .HasForeignKey<Takeaways>(t => t.FK_BookId);
         }
     }
 }

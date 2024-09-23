@@ -1,10 +1,13 @@
+using System.Text.Json;
 using AutoMapper;
 using backend.models.database;
 using backend.models.dto.create;
 using backend.models.dto.get;
+using backend.models.dto.Return;
 using backend.persistence;
 using backend.services;
 using backend.services.gemini;
+using backend.services.jobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,16 +23,19 @@ namespace backend.controllers
         private readonly BookRecomDbContext _context;
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
-        public BookController(IGeminiClient geminiClient, BookRecomDbContext context, IMapper mapper, IBookService bookService)
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        public BookController(IGeminiClient geminiClient, BookRecomDbContext context, 
+                              IMapper mapper, IBookService bookService, IBackgroundTaskQueue backgroundTaskQueue)
         {
             _geminiClient = geminiClient;
             _context = context;
             _mapper = mapper;
             _bookService = bookService;
+            _backgroundTaskQueue = backgroundTaskQueue;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBookToLibraryAsync(BookDTO bookDTO)
+        public async Task<IActionResult> PostBookToLibraryAsync([FromBody]BookDTO bookDTO)
         {
             var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
 
@@ -38,7 +44,7 @@ namespace backend.controllers
 
             Book newBook = _mapper.Map<Book>(bookDTO);
 
-            int addBookToDbResult = await _bookService.AddBookToDb(newBook, _context);
+            int addBookToDbResult = await _bookService.AddBookToDb(newBook);
 
             if(addBookToDbResult == 0)
                 return StatusCode(StatusCodes.Status500InternalServerError, 
@@ -49,20 +55,40 @@ namespace backend.controllers
             return Ok();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> DescribeBook([FromQuery]BookDecriptionDTO bookDescriptionDTO, CancellationToken ct)
+        [HttpPost]
+        public async Task<IActionResult> GetBookDescriptionAndTakeaways([FromBody]GeminiBookDataDTO geminiBookDataDTO, CancellationToken ct)
         {
-            string initialPrompt = "Hello, please give me a short summary of this book." +
-                                     "The title of the book is " + bookDescriptionDTO.Title + 
-                                     " and the name of the author is " + bookDescriptionDTO.Author;
+            var foundBook = _context.Books.FirstOrDefault(b => b.WorkId == geminiBookDataDTO.bookDTO.WorkId);
+            BookDescriptionAndTakeawaysDTO bookDescriptionAndTakeawaysDTO = new(){
+                Description = "",
+                Takeaways = new TakeawaysDTO(){Heading = "", TakeAways=[]}
+            };
 
-            try {
-                string description = await _geminiClient.GenerateContentAsync(initialPrompt, ct);
+            if(foundBook == null)
+            {
+                var generatedBookDescription = await _bookService.GetBookDescription(geminiBookDataDTO, ct);
+                var generatedBookTakeaways = await _bookService.GetBookTakeaways(geminiBookDataDTO, ct);
 
-                return Ok(description);
-            } catch {
-                throw;
+                TakeawaysDTO takeaways = JsonSerializer.Deserialize<TakeawaysDTO>(generatedBookTakeaways, 
+                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+                
+                bookDescriptionAndTakeawaysDTO = new BookDescriptionAndTakeawaysDTO(){
+                    Description = generatedBookDescription,
+                    Takeaways = takeaways
+                };
+
+                return Ok(bookDescriptionAndTakeawaysDTO);
             }
+
+            // TODO: tikriausiai neveiks mapping'as, nes takeawaydto reikalauja takeaways objekto
+            TakeawaysDTO takeawaysDTO = _mapper.Map<TakeawaysDTO>(foundBook.TakeAways);
+
+            bookDescriptionAndTakeawaysDTO = new BookDescriptionAndTakeawaysDTO(){
+                Description = foundBook.Description,
+                Takeaways = takeawaysDTO
+            };
+
+            return Ok(bookDescriptionAndTakeawaysDTO);
         }
     }
 }

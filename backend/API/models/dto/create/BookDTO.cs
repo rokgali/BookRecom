@@ -9,6 +9,7 @@ namespace backend.models.dto.create {
         public DateTime DateAdded = DateTime.UtcNow;
         public int CoverId { get; init; }
         public int AuthorKey { get; set; }
+        public string? AuthorName { get; set; }
         [DisallowNull]
         public required string Description { get; set; }
     }

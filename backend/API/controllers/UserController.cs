@@ -12,13 +12,5 @@ namespace backend.controllers
         {
             _geminiClient = geminiClient;
         }
-
-        [HttpGet]
-        public async Task<IActionResult> UserTestThing(CancellationToken ct)
-        {
-            string generatedGeminiJson = await _geminiClient.GenerateContentAsync("what is dog", ct);
-
-            return Ok(generatedGeminiJson);
-        }
     }
 }

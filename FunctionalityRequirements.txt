@@ -3,7 +3,7 @@
 -- A list of main points of the book is listed for the user
 to read and saved in the database so the prompt doesn't need
 to be recreated.
--- Administrator can manually add characters that chat-bot can 	  imitate
+-- Administrator can manually add characters that chat-bot can imitate
 -- User can have a conversation with the books characters
 
 

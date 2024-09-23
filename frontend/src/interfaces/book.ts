@@ -30,7 +30,9 @@ interface last_modified {
 export interface Book {
     title: string,
     key: string,
+    author_key: string[]
     authors: authors[],
+    author_name: string[],
     covers: number[],
     cover_i: number
     description: description,
