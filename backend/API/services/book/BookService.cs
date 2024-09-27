@@ -5,6 +5,7 @@ using backend.models.dto.get;
 using backend.models.gemini.response;
 using backend.persistence;
 using backend.services.gemini;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,34 +61,40 @@ namespace backend.services.book {
             }
         }
 
-        public async Task<string> GetBookDescription(GeminiBookDataDTO geminiBookDataDTO, CancellationToken ct)
+        public async Task<string> GetBookDescription(string title, string authorName, CancellationToken ct)
         {
             string initialPrompt = "Hello, please give me a short summary of this book." +
-                            "The title of the book is " + geminiBookDataDTO.bookDTO.Title + 
-                            " and the name of the author is " + geminiBookDataDTO.bookDTO.AuthorName;
+                            "The title of the book is " + title + 
+                            " and the name of the author is " + authorName;
 
             try {
-                string description = await _geminiClient.GenerateContentAsync(initialPrompt, "models/gemini-1.5-flash-latest:generateContent", ct);
+                string response = await _geminiClient.GenerateContentAsync(initialPrompt, "models/gemini-1.5-flash-latest:generateContent", ct);
 
-                return description;
+                GeminiTakeawayResponse geminiResponse = JsonSerializer.Deserialize<GeminiTakeawayResponse>(response, 
+                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+
+                return geminiResponse.Candidates[0].Content.Parts[0].Text;
             } catch {
                 throw;
             }
         }
 
-        public async Task<string> GetBookTakeaways(GeminiBookDataDTO geminiBookDataDTO, CancellationToken ct)
+        public async Task<string> GetBookTakeaways(int numberOfTakeaways, string title, string authorName, CancellationToken ct)
         {
-            if(geminiBookDataDTO.NumberOfTakeaways is null)
-                throw new ArgumentNullException("Number of takeaways can not be null");
+            if(numberOfTakeaways < 1 || numberOfTakeaways > 5)
+                throw new ArgumentOutOfRangeException("number of takeaways must be between 1 and 5");
 
-            string initialPrompt = $"Give me {geminiBookDataDTO.NumberOfTakeaways} key " +
-                                    $"takeaways from '{geminiBookDataDTO.bookDTO.Title}' " + 
-                                    $"by {geminiBookDataDTO.bookDTO.AuthorName}";
+            string initialPrompt = $"Give me {numberOfTakeaways} key " +
+                                    $"takeaways from '{title}' " + 
+                                    $"by {authorName}. Do not add any other text besides the json";
 
             try {
-                string description = await _geminiClient.GenerateContentAsync(initialPrompt, "tunedModels/main-book-takeaways-au2dj9bfx11d:generateContent", ct);
+                string response = await _geminiClient.GenerateContentAsync(initialPrompt, "tunedModels/main-book-takeaways-au2dj9bfx11d:generateContent", ct);
 
-                return description;
+                GeminiTakeawayResponse geminiResponse = JsonSerializer.Deserialize<GeminiTakeawayResponse>(response, 
+                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+
+                return geminiResponse.Candidates[0].Content.Parts[0].Text;
             } catch {
                 throw;
             }

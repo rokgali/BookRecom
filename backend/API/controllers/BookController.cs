@@ -1,3 +1,4 @@
+using System.Net.Security;
 using System.Text.Json;
 using AutoMapper;
 using backend.models.database;
@@ -24,14 +25,17 @@ namespace backend.controllers
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        private readonly ILogger<BookController> _logger;
         public BookController(IGeminiClient geminiClient, BookRecomDbContext context, 
-                              IMapper mapper, IBookService bookService, IBackgroundTaskQueue backgroundTaskQueue)
+                              IMapper mapper, IBookService bookService, IBackgroundTaskQueue backgroundTaskQueue,
+                              ILogger<BookController> logger)
         {
             _geminiClient = geminiClient;
             _context = context;
             _mapper = mapper;
             _bookService = bookService;
             _backgroundTaskQueue = backgroundTaskQueue;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -55,40 +59,62 @@ namespace backend.controllers
             return Ok();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetBookDescriptionAndTakeaways([FromBody]GeminiBookDataDTO geminiBookDataDTO, CancellationToken ct)
+        [HttpGet]
+        public async Task<IActionResult> GetBookDescription(string workId, string title, string authorName, CancellationToken ct)
         {
-            var foundBook = _context.Books.FirstOrDefault(b => b.WorkId == geminiBookDataDTO.bookDTO.WorkId);
-            BookDescriptionAndTakeawaysDTO bookDescriptionAndTakeawaysDTO = new(){
-                Description = "",
-                Takeaways = new TakeawaysDTO(){Heading = "", TakeAways=[]}
-            };
+            var foundBook = await _context.Books.FirstOrDefaultAsync(b => b.WorkId == workId);
 
             if(foundBook == null)
             {
-                var generatedBookDescription = await _bookService.GetBookDescription(geminiBookDataDTO, ct);
-                var generatedBookTakeaways = await _bookService.GetBookTakeaways(geminiBookDataDTO, ct);
+                var generatedBookDescription = await _bookService.GetBookDescription(title, authorName, ct);
 
-                TakeawaysDTO takeaways = JsonSerializer.Deserialize<TakeawaysDTO>(generatedBookTakeaways, 
-                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
-                
-                bookDescriptionAndTakeawaysDTO = new BookDescriptionAndTakeawaysDTO(){
-                    Description = generatedBookDescription,
-                    Takeaways = takeaways
-                };
-
-                return Ok(bookDescriptionAndTakeawaysDTO);
+                return Ok(generatedBookDescription);
             }
 
-            // TODO: tikriausiai neveiks mapping'as, nes takeawaydto reikalauja takeaways objekto
-            TakeawaysDTO takeawaysDTO = _mapper.Map<TakeawaysDTO>(foundBook.TakeAways);
+            return Ok(foundBook.Description);
+        }
 
-            bookDescriptionAndTakeawaysDTO = new BookDescriptionAndTakeawaysDTO(){
-                Description = foundBook.Description,
-                Takeaways = takeawaysDTO
-            };
+        [HttpGet]
+        public async Task<IActionResult> GetBookTakeaways(string workId, string title, string authorName, CancellationToken ct)
+        {
+            var foundBook = await _context.Books.FirstOrDefaultAsync(b => b.WorkId == workId);
 
-            return Ok(bookDescriptionAndTakeawaysDTO);
+            if(foundBook == null)
+            {
+                var generatedTakeaways = await _bookService.GetBookTakeaways(5, title, authorName, ct);
+
+                TakeawaysDTO takeaways = JsonSerializer.Deserialize<TakeawaysDTO>(generatedTakeaways, 
+                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+
+                return Ok(takeaways);
+            }
+
+            return Ok(foundBook.TakeAways);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveBookToDatabase(BookDTO bookDTO)
+        {
+            var foundBook = await _context.Books.AnyAsync(b => b.WorkId == bookDTO.WorkId);
+
+            if(foundBook)
+            {
+                return BadRequest("Book with this work id already exists in the database");
+            }
+
+            try {
+                    var newBook = _mapper.Map<Book>(bookDTO);
+                    await _context.Books.AddAsync(newBook);
+
+                    var result = await _context.SaveChangesAsync();
+
+                    if(result == 0)
+                        return StatusCode(500, new {message = "Failed to save book to database"});
+
+                    return Ok("Book succesfully saved");
+            } catch {
+                throw;
+            }
         }
     }
 }

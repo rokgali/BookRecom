@@ -53,6 +53,19 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BookChangeHistory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InsertionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookChangeHistory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Books",
                 columns: table => new
                 {
@@ -61,12 +74,13 @@ namespace backend.Migrations
                     Title = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     WorkId = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
                     DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateRefreshed = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CoverId = table.Column<int>(type: "int", nullable: false),
                     AuthorKey = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MainIdeas = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BookRecommendationIds = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    FK_TakeawaysId = table.Column<int>(type: "int", nullable: false),
+                    BookRecommendationIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SaveError = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -180,6 +194,50 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BookBookChangeHistory",
+                columns: table => new
+                {
+                    BookChangeHistoryId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookBookChangeHistory", x => new { x.BookChangeHistoryId, x.BookId });
+                    table.ForeignKey(
+                        name: "FK_BookBookChangeHistory_BookChangeHistory_BookChangeHistoryId",
+                        column: x => x.BookChangeHistoryId,
+                        principalTable: "BookChangeHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookBookChangeHistory_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Takeaways",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Heading = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FK_BookId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Takeaways", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Takeaways_Books_FK_BookId",
+                        column: x => x.FK_BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserBooks",
                 columns: table => new
                 {
@@ -201,6 +259,28 @@ namespace backend.Migrations
                         name: "FK_UserBooks_Books_BookId",
                         column: x => x.BookId,
                         principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Takeaway",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Lesson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Episode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TakeawaysId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Takeaway", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Takeaway_Takeaways_TakeawaysId",
+                        column: x => x.TakeawaysId,
+                        principalTable: "Takeaways",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -245,6 +325,28 @@ namespace backend.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BookBookChangeHistory_BookId",
+                table: "BookBookChangeHistory",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_WorkId",
+                table: "Books",
+                column: "WorkId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Takeaway_TakeawaysId",
+                table: "Takeaway",
+                column: "TakeawaysId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Takeaways_FK_BookId",
+                table: "Takeaways",
+                column: "FK_BookId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserBooks_UserId",
                 table: "UserBooks",
                 column: "UserId");
@@ -269,10 +371,22 @@ namespace backend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BookBookChangeHistory");
+
+            migrationBuilder.DropTable(
+                name: "Takeaway");
+
+            migrationBuilder.DropTable(
                 name: "UserBooks");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "BookChangeHistory");
+
+            migrationBuilder.DropTable(
+                name: "Takeaways");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

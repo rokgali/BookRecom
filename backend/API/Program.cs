@@ -53,6 +53,11 @@ builder.Services.AddTransient<IBookService, BookService>();
 builder.Services.AddTransient<IBackgroundTaskQueue, BackgroundTaskQueue>();
 builder.Services.AddHostedService<BackgroundJobService>();
 
+builder.Services.AddLogging(options => {
+    options.AddDebug();
+    options.AddConsole();
+});
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
@@ -65,6 +70,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAnyOrigin");
 
 app.UseHttpsRedirection();
 

@@ -4,6 +4,7 @@ import RegisterPage from "../pages/register";
 import Layout from "../components/layout";
 import HomePage from "../pages/home";
 import AuthComponent from "../components/authorization/auth_component";
+import BookPage from "../pages/book";
 
 interface RoutesProps {
     userIsAuthenticated: boolean,
@@ -26,7 +27,13 @@ export default function Routes(props: RoutesProps)
                     loginPath={loginPath}
                     userIsAuthenticated={props.userIsAuthenticated}
                     requiredRoles={ [] }
-                    userRoles={props.userRoles} /> }
+                    userRoles={props.userRoles} /> },
+                {
+                    path: "/book", element: <AuthComponent successfulLoginComponent={<BookPage />} 
+                    loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated}
+                    requiredRoles={ [] } 
+                    userRoles={props.userRoles}/>
+                }
             ]
         }
     ]

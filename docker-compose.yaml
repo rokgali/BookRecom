@@ -1,16 +1,23 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app/frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
     networks:
       - app-network
+    environment:
+      - WDS_SOCKET_HOST=127.0.0.1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true 
+    command: npm run start
     stdin_open: true
     tty: true
 
@@ -18,10 +25,12 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    # volumes:
-    #   - ./backend:/app
+    volumes:
+       - ./backend/API/:/app/API
+       - ./backend/migration/:/app/migration
     ports:
-      - "8080:8080"
+      # - "8080:8080"
+      - "5103:5103"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:

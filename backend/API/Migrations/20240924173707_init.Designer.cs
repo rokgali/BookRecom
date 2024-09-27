@@ -12,7 +12,7 @@ using backend.persistence;
 namespace backend.Migrations
 {
     [DbContext(typeof(BookRecomDbContext))]
-    [Migration("20240913190846_init")]
+    [Migration("20240924173707_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -24,6 +24,21 @@ namespace backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BookBookChangeHistory", b =>
+                {
+                    b.Property<int>("BookChangeHistoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookChangeHistoryId", "BookId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BookBookChangeHistory");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -179,13 +194,16 @@ namespace backend.Migrations
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateCompleted")
+                    b.Property<DateTime>("DateRefreshed")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MainIdeas")
+                    b.Property<int>("FK_TakeawaysId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SaveError")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -200,7 +218,79 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("WorkId")
+                        .IsUnique();
+
                     b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("backend.models.database.BookChangeHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("InsertionDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BookChangeHistory");
+                });
+
+            modelBuilder.Entity("backend.models.database.Takeaway", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Episode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Lesson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TakeawaysId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TakeawaysId");
+
+                    b.ToTable("Takeaway");
+                });
+
+            modelBuilder.Entity("backend.models.database.Takeaways", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FK_BookId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FK_BookId")
+                        .IsUnique();
+
+                    b.ToTable("Takeaways");
                 });
 
             modelBuilder.Entity("backend.models.database.User", b =>
@@ -292,6 +382,21 @@ namespace backend.Migrations
                     b.ToTable("UserBooks");
                 });
 
+            modelBuilder.Entity("BookBookChangeHistory", b =>
+                {
+                    b.HasOne("backend.models.database.BookChangeHistory", null)
+                        .WithMany()
+                        .HasForeignKey("BookChangeHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.models.database.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -343,6 +448,28 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("backend.models.database.Takeaway", b =>
+                {
+                    b.HasOne("backend.models.database.Takeaways", "Takeaways")
+                        .WithMany("TakeAways")
+                        .HasForeignKey("TakeawaysId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Takeaways");
+                });
+
+            modelBuilder.Entity("backend.models.database.Takeaways", b =>
+                {
+                    b.HasOne("backend.models.database.Book", "Book")
+                        .WithOne("TakeAways")
+                        .HasForeignKey("backend.models.database.Takeaways", "FK_BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("backend.models.database.UserBook", b =>
                 {
                     b.HasOne("backend.models.database.Book", "Book")
@@ -364,7 +491,14 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.models.database.Book", b =>
                 {
+                    b.Navigation("TakeAways");
+
                     b.Navigation("UserBooks");
+                });
+
+            modelBuilder.Entity("backend.models.database.Takeaways", b =>
+                {
+                    b.Navigation("TakeAways");
                 });
 
             modelBuilder.Entity("backend.models.database.User", b =>

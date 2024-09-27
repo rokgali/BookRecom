@@ -11,7 +11,7 @@ namespace backend.profilers
             CreateMap<Takeaways, TakeawaysDTO>()
             .ForMember(dest => dest.Heading,
             src => src.MapFrom(s => s.Heading))
-            .ForMember(dest => dest.TakeAways,
+            .ForMember(dest => dest.Takeaways,
             src => src.MapFrom(s => s.TakeAways));
         }
     }

@@ -9,7 +9,7 @@ namespace backend.services {
         public Task<int> AddBookToUser(Book book, User user);
         public Task<int> UpdateBookDescription(string workId, string description);
         public Task<int> UpdateBookTakeaways(string workId, string takeaways);
-        public Task<string> GetBookDescription(GeminiBookDataDTO geminiBookDataDTO, CancellationToken ct);
-        public Task<string> GetBookTakeaways(GeminiBookDataDTO geminiBookDataDTO, CancellationToken ct);
+        public Task<string> GetBookDescription(string title, string authorName, CancellationToken ct);
+        public Task<string> GetBookTakeaways(int numberOfTakeaways, string title, string authorName, CancellationToken ct);
     }
 }
