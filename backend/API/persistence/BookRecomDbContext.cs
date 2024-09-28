@@ -12,6 +12,7 @@ namespace backend.persistence
         public DbSet<BookChangeHistory> BookChangeHistory {get;set;}
         public DbSet<Takeaway> Takeaway {get;set;}
         public DbSet<Takeaways> Takeaways { get; set; }
+        public DbSet<Author> Authors {get;set;}
         public BookRecomDbContext(DbContextOptions<BookRecomDbContext> options) : base(options)
         {
 

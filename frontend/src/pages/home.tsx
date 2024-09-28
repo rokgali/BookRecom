@@ -9,20 +9,29 @@ import { BookPageProps } from "../interfaces/bookpageprops";
 interface HomePageProps {
 }
 
+interface Author {
+    id: number,
+    name: string
+}
+
 export default function HomePage(props: HomePageProps)
 {
     const [searchBooks, setSearchBooks] = useState<OpenLibrarySearchResult>();
+    const [availableAuthors, setAvailableAuthors] = useState<string[]>([]);
 
-    const [selectedBookModalIsOpen, setSelectedBookModalIsOpen] = useState<boolean>(false);
-    const [selectedBook, setSelectedBook] = useState<Book>();
+    const [authorName, setAuthorName] = useState<string>(() => {
+        return localStorage.getItem('authorName') || 'Fyodor Dostoyevsky';
+    });
 
     const [bookSearchLoading, setBookSearchLoading] = useState<boolean>(true);
     const [bookSearchErrorMessage, setBookSearchErrorMessage] = useState<string>();
 
+    const [authorInputError, setAuthorInputError] = useState<string>();
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("https://openlibrary.org/search.json?q=language:eng&limit=20")
+        axios.get(`https://openlibrary.org/search.json?author=%22${authorName}%22`)
         .then(res => {
             const bookSearchResult: OpenLibrarySearchResult = res.data
             
@@ -33,35 +42,76 @@ export default function HomePage(props: HomePageProps)
             setBookSearchErrorMessage('Books failed to load, check input parameters');
             setBookSearchLoading(false);
         })
-    }, [])
+    }, [bookSearchLoading])
 
-    // When books search is performed, the data is cached into db
     useEffect(() => {
-        if(searchBooks === undefined || searchBooks.numFound === 0)
-            return;
-
+        if(availableAuthors.length == 0)
+            return; 
         
-    }, [searchBooks])
+        setAvailableAuthors(availableAuthors.filter(name => 
+                            name.trim().toLowerCase().includes(authorName.trim().toLowerCase())));
+    }, [authorName]);
+
+    useEffect(() => {
+        axios.get(`http://localhost:5103/api/Author/GetAvailableAuthors`)
+        .then(res => {
+            setAvailableAuthors(res.data.map((author: Author) => author.name))
+            console.log(res.data);
+        })
+        .catch(err => {
+        })
+    }, [])
 
     function goToBookPage(props: BookPageProps)
     {
         navigate('/book', {state: props});
     }
 
-    return (<>
-        <div className="flex flex-wrap max-w-full justify-center space-x-3 md:justify-start">
-            {bookSearchErrorMessage && <div className="text-red-500 font-bold text-lg mx-auto w-auto">{bookSearchErrorMessage}</div>}
+    function reloadBookResults()
+    {
+        if(authorName === localStorage.getItem('authorName'))
+            return;
 
-            {bookSearchLoading && <div className="text-center text-green-400 text-lg mx-auto w-auto font-bold">Loading...</div>}
-            {searchBooks?.docs.map((book, id) => (
-                <div key={id} onClick={() => goToBookPage({title: book.title, workId: book.key, coverId: book.cover_i, authorName: book.author_name[0],
-                authorKey: book.author_key[0]})} >
-                    {book.cover_i &&
-                        <BookCardWithImageLoading title={book.title} 
-                        imageURL={`https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg?default=false`} />
-                    }
-                </div>
-            ))}
+        if(!availableAuthors.includes(authorName))
+        {
+            setAuthorInputError('Please select an author from the recommended list');
+            return;
+        }
+
+        localStorage.setItem('authorName', authorName);
+        setBookSearchLoading(true);
+    }
+
+    return (<>
+        <div>
+            <h1>Select an author</h1>
+            <div>
+                <input list="availableAuthors" type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
+                <datalist id="availableAuthors">
+                    {availableAuthors.map((name, index) => (
+                        <option key={index} value={name} ></option>
+                    ))}
+                </datalist>
+                <button onClick={() => reloadBookResults()}>Search</button>
+            </div>
+            {authorInputError && <div className="text-red-500 font-bold text-lg mx-auto w-auto">{authorInputError}</div>}
         </div>
+
+        {bookSearchErrorMessage && <div className="text-red-500 font-bold text-lg mx-auto w-auto">{bookSearchErrorMessage}</div>}
+
+        {bookSearchLoading ? <div className="text-center text-green-400 text-lg mx-auto w-auto font-bold">Loading...</div> :
+            <div className="flex flex-wrap max-w-full justify-center space-x-3 md:justify-start mt-10">
+                {searchBooks && searchBooks?.docs.map((book, id) => (
+                    <div key={id} onClick={() => goToBookPage({title: book.title, workId: book.key, coverId: book.cover_i, authorName: book.author_name[0],
+                    authorKey: book.author_key[0]})} >
+                        {book.cover_i &&
+                            <BookCardWithImageLoading title={book.title} 
+                            imageURL={`https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg?default=false`} />
+                        }
+                    </div>
+                ))}
+            </div>
+        }
+        
     </>)
 }

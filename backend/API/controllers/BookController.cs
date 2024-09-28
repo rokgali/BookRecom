@@ -39,7 +39,7 @@ namespace backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostBookToLibraryAsync([FromBody]BookDTO bookDTO)
+        public async Task<IActionResult> PostBookToLibrary([FromBody]BookDTO bookDTO)
         {
             var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
 
@@ -93,7 +93,7 @@ namespace backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveBookToDatabase(BookDTO bookDTO)
+        public async Task<IActionResult> PostBook(BookDTO bookDTO)
         {
             var foundBook = await _context.Books.AnyAsync(b => b.WorkId == bookDTO.WorkId);
 
