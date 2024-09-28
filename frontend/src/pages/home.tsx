@@ -18,6 +18,7 @@ export default function HomePage(props: HomePageProps)
 {
     const [searchBooks, setSearchBooks] = useState<OpenLibrarySearchResult>();
     const [availableAuthors, setAvailableAuthors] = useState<string[]>([]);
+    const [filteredAvailableAuthors, setFilteredAvailableAuthors] = useState<string[]>(availableAuthors);
 
     const [authorName, setAuthorName] = useState<string>(() => {
         return localStorage.getItem('authorName') || 'Fyodor Dostoyevsky';
@@ -45,18 +46,22 @@ export default function HomePage(props: HomePageProps)
     }, [bookSearchLoading])
 
     useEffect(() => {
+        console.log(availableAuthors);
+
         if(availableAuthors.length == 0)
             return; 
         
-        setAvailableAuthors(availableAuthors.filter(name => 
-                            name.trim().toLowerCase().includes(authorName.trim().toLowerCase())));
+        const filtered = availableAuthors.filter(name => 
+                            name.trim().toLowerCase().includes(authorName.trim().toLowerCase()));
+
+        setFilteredAvailableAuthors(filtered);
+        
     }, [authorName]);
 
     useEffect(() => {
         axios.get(`http://localhost:5103/api/Author/GetAvailableAuthors`)
         .then(res => {
             setAvailableAuthors(res.data.map((author: Author) => author.name))
-            console.log(res.data);
         })
         .catch(err => {
         })
@@ -75,6 +80,9 @@ export default function HomePage(props: HomePageProps)
         if(!availableAuthors.includes(authorName))
         {
             setAuthorInputError('Please select an author from the recommended list');
+            setTimeout(() => {
+                setAuthorInputError('');
+            }, 3000);
             return;
         }
 
@@ -88,7 +96,7 @@ export default function HomePage(props: HomePageProps)
             <div>
                 <input list="availableAuthors" type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
                 <datalist id="availableAuthors">
-                    {availableAuthors.map((name, index) => (
+                    {filteredAvailableAuthors.map((name, index) => (
                         <option key={index} value={name} ></option>
                     ))}
                 </datalist>
