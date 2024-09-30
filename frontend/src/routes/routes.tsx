@@ -5,6 +5,7 @@ import Layout from "../components/layout";
 import HomePage from "../pages/home";
 import AuthComponent from "../components/authorization/auth_component";
 import BookPage from "../pages/book";
+import AuthorSearchResultTable from "../components/author_search_result";
 
 interface RoutesProps {
     userIsAuthenticated: boolean,
@@ -33,6 +34,11 @@ export default function Routes(props: RoutesProps)
                     loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated}
                     requiredRoles={ [] } 
                     userRoles={props.userRoles}/>
+                },
+                {
+                    path: "/edit_authors", element: <AuthComponent successfulLoginComponent={<AuthorSearchResultTable />} 
+                    loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated} requiredRoles={ [] }
+                    userRoles={props.userRoles} />
                 }
             ]
         }

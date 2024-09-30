@@ -2,9 +2,8 @@ using System.Net.Security;
 using System.Text.Json;
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.create;
-using backend.models.dto.get;
-using backend.models.dto.Return;
+using backend.models.dto.RequestArgs;
+using backend.models.dto.ResponseArgs;
 using backend.persistence;
 using backend.services;
 using backend.services.gemini;
@@ -47,6 +46,8 @@ namespace backend.controllers
                 return Conflict(new { message = "A book with this WorkId already exists in users library" });
 
             Book newBook = _mapper.Map<Book>(bookDTO);
+            Author newAuthor = _mapper.Map<Author>(bookDTO.Author);
+            newBook.Author = newAuthor;
 
             int addBookToDbResult = await _bookService.AddBookToDb(newBook);
 
@@ -75,21 +76,24 @@ namespace backend.controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBookTakeaways(string workId, string title, string authorName, CancellationToken ct)
+        public async Task<IActionResult> GetBookTakeaways(int numberOfTakeaways, string workId, string title, string authorName, CancellationToken ct)
         {
+            if(numberOfTakeaways < 0 || numberOfTakeaways > 5)
+                return BadRequest("The number of takeaways must be between 0 and 5");
+
             var foundBook = await _context.Books.FirstOrDefaultAsync(b => b.WorkId == workId);
 
             if(foundBook == null)
             {
-                var generatedTakeaways = await _bookService.GetBookTakeaways(5, title, authorName, ct);
+                var generatedTakeaways = await _bookService.GetBookTakeaways(numberOfTakeaways, title, authorName, ct);
 
-                TakeawaysDTO takeaways = JsonSerializer.Deserialize<TakeawaysDTO>(generatedTakeaways, 
+                IList<TakeawayDTO> takeaways = JsonSerializer.Deserialize<IList<TakeawayDTO>>(generatedTakeaways, 
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
                 return Ok(takeaways);
             }
 
-            return Ok(foundBook.TakeAways);
+            return Ok(foundBook.Takeaways);
         }
 
         [HttpPost]
@@ -104,6 +108,8 @@ namespace backend.controllers
 
             try {
                     var newBook = _mapper.Map<Book>(bookDTO);
+                    var newAuthor = _mapper.Map<Author>(bookDTO.Author);
+
                     await _context.Books.AddAsync(newBook);
 
                     var result = await _context.SaveChangesAsync();

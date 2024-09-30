@@ -1,4 +1,6 @@
+using AutoMapper;
 using backend.models.database;
+using backend.models.dto.RequestArgs;
 using backend.persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -11,15 +13,22 @@ namespace backend.controllers
     public class AuthorController : ControllerBase
     {
         private readonly BookRecomDbContext _context;
-        public AuthorController(BookRecomDbContext context)
+        private readonly IMapper _mapper;
+        public AuthorController(BookRecomDbContext context, Mapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAuthor(string authorName)
+        public async Task<IActionResult> PostAuthor(AuthorDTO authorDTO)
         {
-            var newAuthor = new Author(){Name = authorName};
+            var authorWithKeyExists = _context.Authors.Any(a => a.Key == authorDTO.Key);
+
+            if(authorWithKeyExists)
+                return Conflict("An author with this key already exists");
+
+            var newAuthor = _mapper.Map<Author>(authorDTO);
 
             await _context.Authors.AddAsync(newAuthor);
             var result = await _context.SaveChangesAsync();

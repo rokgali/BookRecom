@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { BookPageProps } from "../interfaces/bookpageprops";
 import TakeawaysResponse, { Takeaway } from "../interfaces/takeawaysResponse";
 import axios from 'axios';
+import Loading from "../components/loading";
 
 export default function BookPage()
 {
@@ -43,26 +44,36 @@ export default function BookPage()
         <>
             {bookDescriptionError && <div>Something went wrong while fetching book description</div>}
             {bookTakeawaysError && <div>Something went wrong while fetching book takeaways</div>}
-            {!bookDescriptionAndTakeawaysLoading && 
+            {!bookDescriptionAndTakeawaysLoading ? 
                 <div>
-                    <div>
-                        {pageProps.title} {pageProps.authorName}
-                    </div>
-                    <div className="font-bold">
-                        {bookDescription}
-                    </div>
-                    <ul>
-                        {bookTakeaways && bookTakeaways?.takeaways.map((takeaway, index) => (
-                            <li key={index}>
-                                <div>takeaway number: {index}</div>
+                    <h1 className="text-bold text-center text-lg mx-auto w-auto my-6">
+                        <div>
+                            {pageProps.title}
+                        </div>
+                        <div>
+                            {pageProps.authorName}
+                        </div>
+                    </h1>
+                    <div className="p-4 mx-auto w-3/4 h-auto rounded-lg bg-blue-200">
+                        <div className="">
+                            {bookDescription}
+                        </div>
+                        <div className="mt-4">
+                            <ul className="space-y-4">
+                                {bookTakeaways && bookTakeaways?.takeaways.map((takeaway, index) => (
+                                    <li key={index}>
+                                        <div>takeaway number: {index + 1}</div>
 
-                                <div>Name: {takeaway.name}</div>
-                                <div>Lesson: {takeaway.lesson}</div>
-                                <div>Episode: {takeaway.episode}</div>
-                            </li>
-                        ))}
-                    </ul>
+                                        <div>Name: {takeaway.name}</div>
+                                        <div>Lesson: {takeaway.lesson}</div>
+                                        <div>Episode: {takeaway.episode}</div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+                : <Loading />
             }
         </>
     );

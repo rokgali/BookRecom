@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using backend.models.database;
-using backend.models.dto.get;
+using backend.models.dto.ResponseArgs;
 using backend.models.gemini.response;
 using backend.persistence;
 using backend.services.gemini;
@@ -40,9 +40,9 @@ namespace backend.services.book {
         public async Task<int> AddBookToUser(Book book, User user)
         {
             UserBook newUserBook = new UserBook {
-                UserId = user.Id,
+                FK_User_Id = user.Id,
                 User = user,
-                BookId = book.Id,
+                FK_Book_Id = book.Id,
                 Book = book,
                 BookStatus = BookStatus.InLibrary
             };
@@ -113,18 +113,14 @@ namespace backend.services.book {
             return result;
         }
 
-        public async Task<int> UpdateBookTakeaways(string workId, string takeaways)
+        public async Task<int> UpdateBookTakeaways(string workId, ICollection<Takeaway> takeaways)
         {
             var foundBook = await _context.Books.FirstOrDefaultAsync(b => b.WorkId == workId);
 
             if(foundBook == null)
                 throw new Exception("Specified book does not exist");
 
-            Takeaways content = JsonSerializer.Deserialize<Takeaways>(takeaways, 
-            new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
-            content.Book = foundBook;
-
-            foundBook.TakeAways = content;
+            foundBook.Takeaways = takeaways;
             var result = await _context.SaveChangesAsync();
 
             return result;

@@ -1,6 +1,6 @@
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.create;
+using backend.models.dto.RequestArgs;
 
 namespace backend.profilers {
     public class UserProfile : Profile {

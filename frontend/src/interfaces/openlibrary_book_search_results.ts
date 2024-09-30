@@ -1,6 +1,6 @@
 import { Book } from "./book"
 
-export interface OpenLibrarySearchResult {
+export interface OpenLibraryBookSearchResult {
     numFound: number,
     start: number,
     numFoundExact: boolean

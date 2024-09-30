@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.create;
+using backend.models.dto.RequestArgs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

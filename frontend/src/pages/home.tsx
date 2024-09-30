@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
-import { OpenLibrarySearchResult } from "../interfaces/openlibrarySearchResult";
+import { OpenLibraryBookSearchResult } from "../interfaces/openlibrary_book_search_results";
 import axios from 'axios'
 import BookCardWithImageLoading from "../components/book_card_with_image_loading";
 import { Book } from "../interfaces/book";
 import { useNavigate } from "react-router-dom";
 import { BookPageProps } from "../interfaces/bookpageprops";
+import Loading from "../components/loading";
 
 interface HomePageProps {
 }
@@ -16,7 +17,7 @@ interface Author {
 
 export default function HomePage(props: HomePageProps)
 {
-    const [searchBooks, setSearchBooks] = useState<OpenLibrarySearchResult>();
+    const [searchBooks, setSearchBooks] = useState<OpenLibraryBookSearchResult>();
     const [availableAuthors, setAvailableAuthors] = useState<string[]>([]);
     const [filteredAvailableAuthors, setFilteredAvailableAuthors] = useState<string[]>(availableAuthors);
 
@@ -34,7 +35,7 @@ export default function HomePage(props: HomePageProps)
     useEffect(() => {
         axios.get(`https://openlibrary.org/search.json?author=%22${authorName}%22`)
         .then(res => {
-            const bookSearchResult: OpenLibrarySearchResult = res.data
+            const bookSearchResult: OpenLibraryBookSearchResult = res.data
             
             setSearchBooks(bookSearchResult);
             setBookSearchLoading(false);
@@ -107,7 +108,7 @@ export default function HomePage(props: HomePageProps)
 
         {bookSearchErrorMessage && <div className="text-red-500 font-bold text-lg mx-auto w-auto">{bookSearchErrorMessage}</div>}
 
-        {bookSearchLoading ? <div className="text-center text-green-400 text-lg mx-auto w-auto font-bold">Loading...</div> :
+        {bookSearchLoading ? <Loading /> :
             <div className="flex flex-wrap max-w-full justify-center space-x-3 md:justify-start mt-10">
                 {searchBooks && searchBooks?.docs.map((book, id) => (
                     <div key={id} onClick={() => goToBookPage({title: book.title, workId: book.key, coverId: book.cover_i, authorName: book.author_name[0],

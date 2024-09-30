@@ -9,9 +9,7 @@ namespace backend.persistence
     {
         public DbSet<Book> Books {get; set;}
         public DbSet<UserBook> UserBooks {get;set;}
-        public DbSet<BookChangeHistory> BookChangeHistory {get;set;}
-        public DbSet<Takeaway> Takeaway {get;set;}
-        public DbSet<Takeaways> Takeaways { get; set; }
+        public DbSet<Takeaway> Takeaways {get;set;}
         public DbSet<Author> Authors {get;set;}
         public BookRecomDbContext(DbContextOptions<BookRecomDbContext> options) : base(options)
         {
@@ -27,17 +25,17 @@ namespace backend.persistence
             // -------------------------------------
 
             builder.Entity<UserBook>()
-                   .HasKey(ub => new { ub.BookId, ub.UserId });
+                   .HasKey(ub => new { ub.FK_Book_Id, ub.FK_User_Id });
 
             builder.Entity<UserBook>()
                    .HasOne(ub => ub.User)
                    .WithMany(u => u.UserBooks)
-                   .HasForeignKey(ub => ub.UserId);
+                   .HasForeignKey(ub => ub.FK_User_Id);
 
             builder.Entity<UserBook>()
                    .HasOne(ub => ub.Book)
                    .WithMany(b => b.UserBooks)
-                   .HasForeignKey(ub => ub.BookId);
+                   .HasForeignKey(ub => ub.FK_Book_Id);
 
             // -------------------------------------
 
@@ -46,11 +44,6 @@ namespace backend.persistence
             .IsUnique();
 
             // -------------------------------------
-
-            builder.Entity<Book>()
-            .HasOne<Takeaways>(b => b.TakeAways)
-            .WithOne(t => t.Book)
-            .HasForeignKey<Takeaways>(t => t.FK_BookId);
         }
     }
 }

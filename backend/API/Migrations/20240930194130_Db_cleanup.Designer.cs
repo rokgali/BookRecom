@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.persistence;
 
@@ -11,9 +12,11 @@ using backend.persistence;
 namespace backend.Migrations
 {
     [DbContext(typeof(BookRecomDbContext))]
-    partial class BookRecomDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240930194130_Db_cleanup")]
+    partial class Db_cleanup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

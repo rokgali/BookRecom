@@ -1,6 +1,4 @@
 
-using backend.models.dto.get;
-
 namespace backend.services.jobs 
 {
     public class BackgroundJobService : BackgroundService
