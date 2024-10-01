@@ -38,7 +38,7 @@ namespace backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostBookToLibrary([FromBody]BookDTO bookDTO)
+        public async Task<IActionResult> AddBookToLibrary([FromBody]BookDTO bookDTO)
         {
             var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
 
@@ -97,18 +97,22 @@ namespace backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostBook(BookDTO bookDTO)
+        public async Task<IActionResult> CreateBook(BookDTO bookDTO)
         {
             var foundBook = await _context.Books.AnyAsync(b => b.WorkId == bookDTO.WorkId);
 
             if(foundBook)
             {
-                return BadRequest("Book with this work id already exists in the database");
+                return Conflict("Book with this work id already exists in the database");
             }
 
             try {
                     var newBook = _mapper.Map<Book>(bookDTO);
                     var newAuthor = _mapper.Map<Author>(bookDTO.Author);
+                    var newTakeaways = _mapper.Map<ICollection<Takeaway>>(bookDTO.Takeaways);
+
+                    newBook.Author = newAuthor;
+                    newBook.Takeaways = newTakeaways; 
 
                     await _context.Books.AddAsync(newBook);
 

@@ -14,14 +14,14 @@ namespace backend.controllers
     {
         private readonly BookRecomDbContext _context;
         private readonly IMapper _mapper;
-        public AuthorController(BookRecomDbContext context, Mapper mapper)
+        public AuthorController(BookRecomDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAuthor(AuthorDTO authorDTO)
+        public async Task<IActionResult> CreateAuthor(AuthorDTO authorDTO)
         {
             var authorWithKeyExists = _context.Authors.Any(a => a.Key == authorDTO.Key);
 
