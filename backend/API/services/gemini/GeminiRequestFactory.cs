@@ -2,9 +2,9 @@ using backend.models.gemini.request;
 
 namespace backend.services.gemini
 {
-    internal sealed class GeminiRequestFactory
+    internal sealed class GeminiRequestFactory : IGeminiRequestFactory
     {
-        public static GeminiRequest CreateRequest(string prompt)
+        public GeminiRequest CreateRequest(string prompt)
         {
             return new GeminiRequest
             {

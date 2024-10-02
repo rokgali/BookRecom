@@ -1,6 +1,6 @@
 namespace backend.models.gemini.request
 {
-    internal sealed class GenerationConfig
+    public sealed class GenerationConfig
     {
         public int Temperature { get; set; }
         public int TopK { get; set; }

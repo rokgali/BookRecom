@@ -48,6 +48,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient<IGeminiClient, GeminiClient>();
 builder.Services.AddHttpClient<GeminiClient>();
 
+builder.Services.AddTransient<IGeminiRequestFactory, GeminiRequestFactory>();
+
 builder.Services.AddTransient<IBookService, BookService>();
 
 builder.Services.AddTransient<IBackgroundTaskQueue, BackgroundTaskQueue>();

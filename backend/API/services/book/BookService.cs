@@ -70,7 +70,7 @@ namespace backend.services.book {
             try {
                 string response = await _geminiClient.GenerateContentAsync(initialPrompt, "models/gemini-1.5-flash-latest:generateContent", ct);
 
-                GeminiTakeawayResponse geminiResponse = JsonSerializer.Deserialize<GeminiTakeawayResponse>(response, 
+                GeminiResponse geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(response, 
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
                 return geminiResponse.Candidates[0].Content.Parts[0].Text;
@@ -91,7 +91,7 @@ namespace backend.services.book {
             try {
                 string response = await _geminiClient.GenerateContentAsync(initialPrompt, "tunedModels/main-book-takeaways-au2dj9bfx11d:generateContent", ct);
 
-                GeminiTakeawayResponse geminiResponse = JsonSerializer.Deserialize<GeminiTakeawayResponse>(response, 
+                GeminiResponse geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(response, 
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
                 return geminiResponse.Candidates[0].Content.Parts[0].Text;

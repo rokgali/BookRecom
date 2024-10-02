@@ -1,6 +1,6 @@
 namespace backend.models.gemini.request
 {
-    internal sealed class GeminiRequest
+    public class GeminiRequest
     {
         public required GeminiContent[] Contents { get; set; }
         public GenerationConfig? GenerationConfig { get; set; }

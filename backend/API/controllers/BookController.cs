@@ -4,6 +4,7 @@ using AutoMapper;
 using backend.models.database;
 using backend.models.dto.RequestArgs;
 using backend.models.dto.ResponseArgs;
+using backend.models.dto.TakeawayResponseDTO;
 using backend.persistence;
 using backend.services;
 using backend.services.gemini;
@@ -87,7 +88,7 @@ namespace backend.controllers
             {
                 var generatedTakeaways = await _bookService.GetBookTakeaways(numberOfTakeaways, title, authorName, ct);
 
-                IList<TakeawayDTO> takeaways = JsonSerializer.Deserialize<IList<TakeawayDTO>>(generatedTakeaways, 
+                TakeawayResponseDTO takeaways = JsonSerializer.Deserialize<TakeawayResponseDTO>(generatedTakeaways, 
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
                 return Ok(takeaways);

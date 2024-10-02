@@ -11,17 +11,19 @@ namespace backend.services.gemini
         private readonly HttpClient _httpClient;
         private readonly ILogger<GeminiClient> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IGeminiRequestFactory _geminiRequestFactory;
 
-        public GeminiClient(HttpClient httpClient, ILogger<GeminiClient> logger, IConfiguration configuration)
+        public GeminiClient(HttpClient httpClient, ILogger<GeminiClient> logger, IConfiguration configuration, IGeminiRequestFactory geminiRequestFactory)
         {
             _httpClient = httpClient;
             _logger = logger;
             _configuration = configuration;
+            _geminiRequestFactory = geminiRequestFactory;
         }
 
         public async Task<string> GenerateContentAsync(string prompt, string model, CancellationToken cancellationToken)
         {
-            var requestBody = GeminiRequestFactory.CreateRequest(prompt);
+            var requestBody = _geminiRequestFactory.CreateRequest(prompt);
             var content = new StringContent(JsonSerializer.Serialize(requestBody, 
             new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase}), Encoding.UTF8, "application/json");
 
