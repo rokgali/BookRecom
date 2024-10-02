@@ -1,23 +1,31 @@
-import SideNav from "./sidenav";
 import { Outlet } from "react-router-dom";
 import TopNav from "./topnav";
 import { NavigationPage } from "../../interfaces/navigation_page";
+import SideNav from "./sidenav/expanded_sidenav";
+import ExpandableSidenav from "./sidenav/expandable_sidenav";
+import { useEffect, useState } from "react";
+import Loading from "../loading";
 
-export default function Layout()
+interface LayoutProps {
+}
+
+export default function Layout(props: LayoutProps)
 {
-    const pages: NavigationPage[] = [{name: 'Home', link: '/'}, {name: 'Edit Authors', link: '/author_editing'}]
+    const navigations: NavigationPage[] = [{name: 'Home', link: '/'}, {name: 'Edit Authors', link: '/author_editing'}]
 
     return (
         <>
             <div>
-                <TopNav navigations={pages} />
-            </div>
-            <div className="flex h-full">
-                <SideNav navigations={pages} />
+                <div>
+                    <TopNav navigations={navigations} />
+                </div>
+                <div className="flex min-h-screen">
+                    <ExpandableSidenav navigations={navigations} />
 
-                <main className="lg:h-5/6 w-full">
-                    <Outlet />
-                </main>
+                    <main className="min-h-full lg:min-h-5/6 w-full">
+                        <Outlet />
+                    </main>
+                </div>
             </div>
         </>
     );

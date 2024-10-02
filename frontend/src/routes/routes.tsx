@@ -7,6 +7,7 @@ import AuthComponent from "../components/authorization/auth_component";
 import BookPage from "../pages/book";
 import AuthorSearchResultTable from "../components/author_search_result";
 import AuthorEditing from "../pages/author_editing";
+import { useState } from "react";
 
 interface RoutesProps {
     userIsAuthenticated: boolean,
@@ -16,6 +17,12 @@ interface RoutesProps {
 export default function Routes(props: RoutesProps)
 {
     const loginPath: string = "login"
+    const [loading, setLoading] = useState<boolean>(false);
+
+    function SetPageIsLoading(isLoading: boolean)
+    {
+        setLoading(isLoading);
+    }
 
     const routes: RouteObject[] = [
         { path: loginPath, element: <LoginPage /> },
@@ -25,7 +32,7 @@ export default function Routes(props: RoutesProps)
             element: <Layout />,
             children: [
                 { index: true, element: <AuthComponent 
-                    successfulLoginComponent={<HomePage/>}
+                    successfulLoginComponent={<HomePage />}
                     loginPath={loginPath}
                     userIsAuthenticated={props.userIsAuthenticated}
                     requiredRoles={ [] }

@@ -22,9 +22,9 @@ export default function BookPage()
         const fetchBookDescriptionAndTakeaways = async () => {
                 const getBookDescriptionRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookDescription?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                        .then(res => setBookDescription(res.data))
-                                                       .catch(err => setBookDescriptionError("Book description failed to load"));
+                                                       .catch(err => {setBookDescriptionError("Book description failed to load"); console.error(err)});
 
-                const getBookTakeawaysRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookTakeaways?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
+                const getBookTakeawaysRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookTakeaways?numberOfTakeaways=5&workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                      .then(res => { setBookTakeaways(res.data); console.log(res.data) })
                                                      .catch(err => setBookTakeawaysError("Book takeaways failed to load"));
 
@@ -43,8 +43,8 @@ export default function BookPage()
 
     return (
         <>
-            {bookDescriptionError && <div>Something went wrong while fetching book description</div>}
-            {bookTakeawaysError && <div>Something went wrong while fetching book takeaways</div>}
+            {bookDescriptionError && <div>{bookDescriptionError}</div>}
+            {bookTakeawaysError && <div>{bookTakeawaysError}</div>}
             {!bookDescriptionAndTakeawaysLoading ? 
                 <div>
                     <h1 className="text-bold text-center text-lg mx-auto w-auto my-6">

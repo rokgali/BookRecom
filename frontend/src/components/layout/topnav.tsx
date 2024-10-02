@@ -11,7 +11,7 @@ export default function TopNav(props: TopNavProps)
     const navigate = useNavigate();
 
     return (
-        <div className="lg:block lg:w-screen lg:h-16 lg:shadow-lg lg:bg-green-300 hidden">
+        <div className="lg:block lg:w-screen lg:h-16 lg:shadow-lg lg:bg-green-300 hidden my-auto">
             <ul className="flex justify-around">
                 {props.navigations.map((navigation, index) => (
                     <li key={index} onClick={() => navigate(navigation.link)}>

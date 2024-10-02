@@ -34,7 +34,16 @@ export default function HomePage(props: HomePageProps)
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${OpenLibraryUrl}/search.json?author=%22${authorName}%22`)
+        axios.get(`${BookrecomAPIUrl}/Author/GetAvailableAuthors`)
+        .then(res => {
+            setAvailableAuthors(res.data.map((author: Author) => author.name))
+        })
+        .catch(err => {
+        })
+    }, [])
+
+    useEffect(() => {
+        axios.get(`${OpenLibraryUrl}/search.json?author=%22${authorName}%22&limit=23`)
         .then(res => {
             const bookSearchResult: OpenLibraryBookSearchResult = res.data
             
@@ -48,7 +57,7 @@ export default function HomePage(props: HomePageProps)
     }, [bookSearchLoading])
 
     useEffect(() => {
-        console.log(availableAuthors);
+        // console.log(availableAuthors);
 
         if(availableAuthors.length == 0)
             return; 
@@ -59,15 +68,6 @@ export default function HomePage(props: HomePageProps)
         setFilteredAvailableAuthors(filtered);
         
     }, [authorName]);
-
-    useEffect(() => {
-        axios.get(`${BookrecomAPIUrl}/Author/GetAvailableAuthors`)
-        .then(res => {
-            setAvailableAuthors(res.data.map((author: Author) => author.name))
-        })
-        .catch(err => {
-        })
-    }, [])
 
     function goToBookPage(props: BookPageProps)
     {
