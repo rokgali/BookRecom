@@ -40,6 +40,24 @@ namespace backend.controllers
             return Ok("Inserted author to database succesfully");
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> RemoveAuthor(string authorKey)
+        {
+            var authorToDelete = await _context.Authors.FirstOrDefaultAsync(a => a.Key == authorKey);
+
+            if(authorToDelete == null)
+                return BadRequest("This author doesn't exist in the database");
+
+            _context.Authors.Remove(authorToDelete);
+            var result = await _context.SaveChangesAsync();
+
+            if(result == 0)
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                new { message = "Failed to remove from database" });
+
+            return Ok("Removed author from the database succesfully");            
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAvailableAuthors()
         {

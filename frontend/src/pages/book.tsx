@@ -4,6 +4,7 @@ import { BookPageProps } from "../interfaces/bookpageprops";
 import TakeawaysResponse, { Takeaway } from "../interfaces/takeawaysResponse";
 import axios from 'axios';
 import Loading from "../components/loading";
+import { BookrecomAPIUrl } from "../components/globals/ulrs";
 
 export default function BookPage()
 {
@@ -19,11 +20,11 @@ export default function BookPage()
 
     useEffect(() => {
         const fetchBookDescriptionAndTakeaways = async () => {
-                const getBookDescriptionRequest = axios.get(`http://localhost:5103/api/Book/GetBookDescription?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
+                const getBookDescriptionRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookDescription?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                        .then(res => setBookDescription(res.data))
                                                        .catch(err => setBookDescriptionError("Book description failed to load"));
 
-                const getBookTakeawaysRequest = axios.get(`http://localhost:5103/api/Book/GetBookTakeaways?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
+                const getBookTakeawaysRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookTakeaways?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                      .then(res => { setBookTakeaways(res.data); console.log(res.data) })
                                                      .catch(err => setBookTakeawaysError("Book takeaways failed to load"));
 

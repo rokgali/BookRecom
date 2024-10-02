@@ -1,7 +1,7 @@
 import { RouteObject, useRoutes } from "react-router-dom";
 import LoginPage from "../pages/login";
 import RegisterPage from "../pages/register";
-import Layout from "../components/layout";
+import Layout from "../components/layout/layout";
 import HomePage from "../pages/home";
 import AuthComponent from "../components/authorization/auth_component";
 import BookPage from "../pages/book";

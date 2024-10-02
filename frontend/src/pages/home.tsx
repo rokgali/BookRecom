@@ -6,6 +6,7 @@ import { Book } from "../interfaces/book";
 import { useNavigate } from "react-router-dom";
 import { BookPageProps } from "../interfaces/bookpageprops";
 import Loading from "../components/loading";
+import { BookrecomAPIUrl, OpenLibraryCoversUlr, OpenLibraryUrl } from "../components/globals/ulrs";
 
 interface HomePageProps {
 }
@@ -33,7 +34,7 @@ export default function HomePage(props: HomePageProps)
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`https://openlibrary.org/search.json?author=%22${authorName}%22`)
+        axios.get(`${OpenLibraryUrl}/search.json?author=%22${authorName}%22`)
         .then(res => {
             const bookSearchResult: OpenLibraryBookSearchResult = res.data
             
@@ -60,7 +61,7 @@ export default function HomePage(props: HomePageProps)
     }, [authorName]);
 
     useEffect(() => {
-        axios.get(`http://localhost:5103/api/Author/GetAvailableAuthors`)
+        axios.get(`${BookrecomAPIUrl}/Author/GetAvailableAuthors`)
         .then(res => {
             setAvailableAuthors(res.data.map((author: Author) => author.name))
         })
@@ -115,7 +116,7 @@ export default function HomePage(props: HomePageProps)
                     authorKey: book.author_key[0]})} >
                         {book.cover_i &&
                             <BookCardWithImageLoading title={book.title} 
-                            imageURL={`https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg?default=false`} />
+                            imageURL={`${OpenLibraryCoversUlr}/b/id/${book.cover_i}-L.jpg?default=false`} />
                         }
                     </div>
                 ))}

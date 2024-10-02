@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import OpenLibraryAuthorSearchResult from "../interfaces/openlibrary_author_search_results";
 import axios from "axios";
 import Loading from "./loading";
-import SavedSuccesfully from "./notifications/saved_succesfully";
+import { BookrecomAPIUrl, OpenLibraryUrl } from "./globals/ulrs";
+import OperationSuccess from "./notifications/operation_success";
+import OperationFailure from "./notifications/operation_failure";
 
 interface Author {
     name: string,
@@ -16,7 +18,12 @@ export default function AuthorSearchResultTable()
     const [selectedAuthors, setSelectedAuthors] = useState<Author[]>([]);
     const [selectedAuthorsLoading, setSelectedAuthorsLoading] = useState<boolean>(true);
 
-    const [showSavedAuthorSuccessfully, setShowSavedAuthorSuccesfully] = useState<boolean>(false);
+    const [showOperationSuccess, setShowOperationSuccess] = useState<boolean>(false);
+    const [operationSuccessMessage, setOperationSuccessMessage] = useState<string>('');
+
+    const [showOperationFailure, setShowOperationFailute] = useState<boolean>(false);
+    const [operationFailureMessage, setOperationFailureMessage] = useState<string>('');
+
     const [refreshGetAuthors, setRefreshGetAuthors] = useState<boolean>(false);
 
     useEffect(() => {
@@ -25,7 +32,7 @@ export default function AuthorSearchResultTable()
     }, [refreshGetAuthors])
 
     useEffect(() => {
-        axios.get(`https://openlibrary.org/search/authors.json?q=${authorName}`)
+        axios.get(`${OpenLibraryUrl}/search/authors.json?q=${authorName}`)
         .then(res => {
             setSearchAuthors(res.data);
         })
@@ -35,39 +42,57 @@ export default function AuthorSearchResultTable()
     }, [authorName]);
 
     function GetAuthors() {
-        axios.get(`http://localhost:5103/api/Author/GetAvailableAuthors`)
+        axios.get(`${BookrecomAPIUrl}/Author/GetAvailableAuthors`)
         .then(res => { setSelectedAuthors(res.data); setSelectedAuthorsLoading(false) })
         .catch(err => { setSelectedAuthorsLoading(false) })
     }
 
     function SaveAuthorToDb(authorToSend: Author) {
-        axios.post(`http://localhost:5103/api/Author/CreateAuthor`, authorToSend)
-        .then(res => {setShowSavedAuthorSuccesfully(true); setRefreshGetAuthors(true)})
-        .catch(err => {console.error(err)})
-
+        axios.post(`${BookrecomAPIUrl}/Author/CreateAuthor`, authorToSend)
+        .then(res => {setShowOperationSuccess(true); setOperationSuccessMessage('Author created succesfully'); setRefreshGetAuthors(true)})
+        .catch(err => {setShowOperationFailute(true); setOperationFailureMessage('Failed to create author')});
     }
 
     function RemoveAuthorFromDb(authorKey: string) {
-
+        axios.delete(`${BookrecomAPIUrl}/Author/RemoveAuthor?authorKey=${authorKey}`)
+        .then(res => {setShowOperationSuccess(true); setOperationSuccessMessage('Author removed succesfully'); setRefreshGetAuthors(true)})
+        .catch(err => {setShowOperationFailute(true); setOperationFailureMessage('Failed to remove author')});
     }
 
-    function ShowSavedAuthorSuccesfullyComplete()
+    function ShowOperationSuccessComplete()
     {
-        setShowSavedAuthorSuccesfully(false);
+        setShowOperationSuccess(false);
+        setOperationSuccessMessage('');
+    }
+
+    function ShowOperationFailureComplete()
+    {
+        setShowOperationFailute(false);
+        setOperationFailureMessage('');
     }
 
     return (
     <>
-        {showSavedAuthorSuccessfully &&         
+        {showOperationSuccess &&         
             <div>
-                <SavedSuccesfully message="Saved author succesfully" duration={5000} onComplete={() => ShowSavedAuthorSuccesfullyComplete()} />
+                <OperationSuccess message={operationSuccessMessage} duration={5000} onComplete={() => ShowOperationSuccessComplete()} />
             </div>
         }
+
+        {showOperationFailure &&
+            <div>
+                <OperationFailure message={operationFailureMessage} duration={5000} onComplete={() => ShowOperationFailureComplete()} />
+            </div>
+        }
+
         <div className="flex">
             {selectedAuthorsLoading ? <Loading /> :
             <>
-                <div className="flex-1 mr-4">
-                    <input type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
+                <div className="flex-1 mr-4 p-2">
+                    <div>
+                        <input className="border rounded-lg px-2" placeholder="Search for author" 
+                        type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
+                    </div>
                     <ul className="space-y-4">
                         {searchAuthors?.docs.map((author, index) => (
                         <li key={index}>
@@ -90,7 +115,10 @@ export default function AuthorSearchResultTable()
                 </div>
                 <div className="flex-1">
                     {selectedAuthors.map((author, index) => (
-                        <div key={index}>{author.name} {author.key}</div>
+                        <div key={index}>
+                            <div className="mr-4">{author.name} {author.key}</div>
+                            <button className="rounded-lg shadow-lg py-4 px-2 bg-red-400" onClick={() => RemoveAuthorFromDb(author.key)}>Remove author</button>
+                        </div>
                     ))}
                 </div>
             </>

@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react"
+import { OperationProps } from "../../interfaces/operation_props";
 
-interface SavedSuccesfullyProps {
-    message: string,
-    duration: number,
-    onComplete(): void
-}
-
-export default function SavedSuccesfully(props: SavedSuccesfullyProps)
+export default function OperationSuccess(props: OperationProps)
 {
     useEffect(() => {
         setTimeout(() => {
