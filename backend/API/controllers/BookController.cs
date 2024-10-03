@@ -38,29 +38,6 @@ namespace backend.controllers
             _logger = logger;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddBookToLibrary([FromBody]BookDTO bookDTO)
-        {
-            var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
-
-            if(bookInLibraryExists)
-                return Conflict(new { message = "A book with this WorkId already exists in users library" });
-
-            Book newBook = _mapper.Map<Book>(bookDTO);
-            Author newAuthor = _mapper.Map<Author>(bookDTO.Author);
-            newBook.Author = newAuthor;
-
-            int addBookToDbResult = await _bookService.AddBookToDb(newBook);
-
-            if(addBookToDbResult == 0)
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                new { message = "Failed to add book to the database" });
-
-            // int addBookToUser = await _bookService.AddBookToUser(newBook, )
-
-            return Ok();
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetBookDescription(string workId, string title, string authorName, CancellationToken ct)
         {
@@ -82,7 +59,7 @@ namespace backend.controllers
             if(numberOfTakeaways < 0 || numberOfTakeaways > 5)
                 return BadRequest("The number of takeaways must be between 0 and 5");
 
-            var foundBook = await _context.Books.FirstOrDefaultAsync(b => b.WorkId == workId);
+            var foundBook = await _context.Books.Include(b => b.Takeaways).FirstOrDefaultAsync(b => b.WorkId == workId);
 
             if(foundBook == null)
             {
@@ -100,32 +77,23 @@ namespace backend.controllers
         [HttpPost]
         public async Task<IActionResult> CreateBook(BookDTO bookDTO)
         {
-            var foundBook = await _context.Books.AnyAsync(b => b.WorkId == bookDTO.WorkId);
+            var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
 
-            if(foundBook)
-            {
-                return Conflict("Book with this work id already exists in the database");
-            }
+            if(bookInLibraryExists)
+                return Conflict(new { message = "A book with this WorkId already exists in the database" });
 
-            try {
-                    var newBook = _mapper.Map<Book>(bookDTO);
-                    var newAuthor = _mapper.Map<Author>(bookDTO.Author);
-                    var newTakeaways = _mapper.Map<ICollection<Takeaway>>(bookDTO.Takeaways);
+            Book newBook = _mapper.Map<Book>(bookDTO);
+            Author newAuthor = _mapper.Map<Author>(bookDTO.Author);
+            newBook.Author = newAuthor;
 
-                    newBook.Author = newAuthor;
-                    newBook.Takeaways = newTakeaways; 
+            int addBookToDbResult = await _bookService.AddBookToDb(newBook);
 
-                    await _context.Books.AddAsync(newBook);
+            if(addBookToDbResult == 0)
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                new { message = "Failed to add book to the database" });
 
-                    var result = await _context.SaveChangesAsync();
 
-                    if(result == 0)
-                        return StatusCode(500, new {message = "Failed to save book to database"});
-
-                    return Ok("Book succesfully saved");
-            } catch {
-                throw;
-            }
+            return Ok("Book succesfully added to");
         }
     }
 }

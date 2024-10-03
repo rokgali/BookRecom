@@ -5,6 +5,7 @@ import TakeawaysResponse, { Takeaway } from "../interfaces/takeawaysResponse";
 import axios from 'axios';
 import Loading from "../components/loading";
 import { BookrecomAPIUrl } from "../components/globals/ulrs";
+import { PostBook } from "../interfaces/book";
 
 export default function BookPage()
 {
@@ -13,20 +14,21 @@ export default function BookPage()
 
     const [bookDescriptionAndTakeawaysLoading, setBookDescriptionAndTakeawaysLoading] = useState<boolean>(true);
     const [bookDescription, setBookDescription] = useState<string>('');
-    const [bookTakeaways, setBookTakeaways] = useState<TakeawaysResponse>();
+    const [bookTakeaways, setBookTakeaways] = useState<TakeawaysResponse>({heading:'', takeaways:[]});
 
     const [bookDescriptionError, setBookDescriptionError] = useState<string>(); 
     const [bookTakeawaysError, setBookTakeawaysError] = useState<string>();
+    const [failedToLoad, setFailedToLoad] = useState<boolean>(false);
 
     useEffect(() => {
-        const fetchBookDescriptionAndTakeaways = async () => {
+        const FetchBookDescriptionAndTakeaways = async () => {
                 const getBookDescriptionRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookDescription?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                        .then(res => setBookDescription(res.data))
-                                                       .catch(err => {setBookDescriptionError("Book description failed to load"); console.error(err)});
+                                                       .catch(err => {setBookDescriptionError("Book description failed to load"); setFailedToLoad(true); console.error(err)});
 
                 const getBookTakeawaysRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookTakeaways?numberOfTakeaways=5&workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                      .then(res => { setBookTakeaways(res.data); console.log(res.data) })
-                                                     .catch(err => setBookTakeawaysError("Book takeaways failed to load"));
+                                                     .catch(err => {setBookTakeawaysError("Book takeaways failed to load"); setFailedToLoad(true)});
 
             try {
                 await Promise.all([getBookDescriptionRequest, getBookTakeawaysRequest]);
@@ -37,15 +39,29 @@ export default function BookPage()
             }
         }
 
-        fetchBookDescriptionAndTakeaways();
+        FetchBookDescriptionAndTakeaways();
 
+        const bookToSave:PostBook = {title:pageProps.title, workId:pageProps.workId, coverId:pageProps.coverId,
+            author: {name: pageProps.authorName, key: pageProps.authorKey}, 
+            description:bookDescription, takeaways:bookTakeaways}
+
+        // SaveBookToDb(bookToSave);
     }, [])
+
+    function SaveBookToDb(bookToSave: PostBook)
+    {
+        axios.post(`${BookrecomAPIUrl}/Book/CreateBook`, bookToSave)
+        .then(res => {console.log(res.data)})
+        .catch(err => console.error(err));
+    }
 
     return (
         <>
-            {bookDescriptionError && <div>{bookDescriptionError}</div>}
-            {bookTakeawaysError && <div>{bookTakeawaysError}</div>}
-            {!bookDescriptionAndTakeawaysLoading ? 
+            {failedToLoad ? <div>Failed to load</div> 
+            
+            :
+
+            !bookDescriptionAndTakeawaysLoading ? 
                 <div>
                     <h1 className="text-bold text-center text-lg mx-auto w-auto my-6">
                         <div>

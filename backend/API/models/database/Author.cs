@@ -7,7 +7,7 @@ namespace backend.models.database
     public class Author 
     {
         public int Id {get;set;}
-        [MaxLength(20)]
+        [MaxLength(100)]
         public required string Name {get;set;}
         [MaxLength(11)]
         public required string Key {get;set;}

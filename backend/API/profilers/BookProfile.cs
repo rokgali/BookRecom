@@ -18,7 +18,13 @@ namespace backend.profilers
             .ForMember(des => des.Author,
             src => src.MapFrom(x => x.Author))
             .ForMember(dest => dest.Description,
-            src => src.MapFrom(x => x.Description));
+            src => src.MapFrom(x => x.Description))
+            .ForMember(dest => dest.BookRecommendationIds,
+            src => src.Ignore())
+            .ForMember(dest => dest.Takeaways,
+            src => src.Ignore())
+            .ForMember(dest => dest.TakeawaysHeading,
+            src => src.Ignore());
         }
     }
 }

@@ -16,6 +16,6 @@ namespace backend.models.dto.RequestArgs {
         [AllowNull]
         public string? Description { get; init; }
         [AllowNull]
-        public ICollection<TakeawayDTO>? Takeaways {get;init;}
+        public TakeawaysDTO? Takeaways {get;init;}
     }
 }

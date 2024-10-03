@@ -1,3 +1,5 @@
+import TakeawaysResponse from "./takeawaysResponse"
+
 interface description {
     type: string,
     value: string,
@@ -27,7 +29,7 @@ interface last_modified {
     value: string
 }
 
-export interface Book {
+export interface GetBook {
     title: string,
     key: string,
     author_key: string[]
@@ -39,4 +41,18 @@ export interface Book {
     subjects: string[],
     created: created,
     last_modified: last_modified
+}
+
+interface Author {
+    name: string,
+    key: string
+}
+
+export interface PostBook {
+    title: string,
+    workId: string,
+    coverId: number,
+    author: Author,
+    description: string,
+    takeaways: TakeawaysResponse
 }

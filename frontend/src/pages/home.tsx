@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { OpenLibraryBookSearchResult } from "../interfaces/openlibrary_book_search_results";
 import axios from 'axios'
 import BookCardWithImageLoading from "../components/book_card_with_image_loading";
-import { Book } from "../interfaces/book";
+import { GetBook } from "../interfaces/book";
 import { useNavigate } from "react-router-dom";
 import { BookPageProps } from "../interfaces/bookpageprops";
 import Loading from "../components/loading";
@@ -57,8 +57,6 @@ export default function HomePage(props: HomePageProps)
     }, [bookSearchLoading])
 
     useEffect(() => {
-        // console.log(availableAuthors);
-
         if(availableAuthors.length == 0)
             return; 
         
