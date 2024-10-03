@@ -14,7 +14,7 @@ export default function Layout(props: LayoutProps)
 
     return (
         <>
-            <div>
+            <div className="w-full">
                 <div className="lg:block hidden">
                     <TopNavigation navigations={navigations} />
                 </div>
@@ -23,7 +23,7 @@ export default function Layout(props: LayoutProps)
                         <ExpandableSidenav navigations={navigations} />
                     </div>
 
-                    <main className="min-h-full lg:min-h-5/6 w-full ml-24 lg:ml-0 flex-5/6 lg:flex-1 lg:mt-16">
+                    <main className="min-h-full w-full lg:min-h-5/6 ml-24 lg:ml-0 flex-5/6 lg:mt-16 lg:px-20">
                         <Outlet />
                     </main>
                 </div>

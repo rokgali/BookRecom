@@ -13,8 +13,6 @@ export default function TopNavigation(props: TopNavigationProps) {
 
   function UnderLineNav(path: string): boolean
   {
-    console.log(location.pathname);
-
     if(location.pathname === path)
       return true;
 

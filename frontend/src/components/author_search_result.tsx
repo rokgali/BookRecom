@@ -88,7 +88,7 @@ export default function AuthorSearchResultTable()
         <div className="flex">
             {selectedAuthorsLoading ? <Loading /> :
             <>
-                <div className="flex-1 mr-4 p-2">
+                <div className="flex-1 p-2">
                     <div>
                         <input className="border rounded-lg px-2" placeholder="Search for author" 
                         type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)} />
