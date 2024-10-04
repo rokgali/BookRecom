@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using backend.models.database;
-using backend.models.dto.ResponseArgs;
+using backend.models.dto.Response;
 
-namespace backend.models.dto.RequestArgs {
-    public record BookDTO {
+namespace backend.models.dto.Response
+{
+    public record BookResponseDTO {
         [DisallowNull]
         public required string Title {get;init;}
         [DisallowNull]
@@ -11,11 +11,12 @@ namespace backend.models.dto.RequestArgs {
         public DateTime DateAdded = DateTime.UtcNow;
         [DisallowNull]
         public int CoverId { get; init; }
+        public string? TakeawaysHeading {get;set;}
         [DisallowNull]
-        public AuthorDTO? Author {get;init;}
+        public AuthorResponseDTO Author {get;init;}
         [AllowNull]
         public string? Description { get; init; }
-        [AllowNull]
-        public TakeawaysDTO? Takeaways {get;init;}
+        [DisallowNull]
+        public required ICollection<TakeawayResponseDTO> Takeaways {get;init;}
     }
 }

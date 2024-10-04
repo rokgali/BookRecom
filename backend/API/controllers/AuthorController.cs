@@ -1,6 +1,6 @@
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.RequestArgs;
+using backend.models.dto.Create;
 using backend.persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -21,7 +21,7 @@ namespace backend.controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAuthor(AuthorDTO authorDTO)
+        public async Task<IActionResult> CreateAuthor(CreateAuthorDTO authorDTO)
         {
             var authorWithKeyExists = _context.Authors.Any(a => a.Key == authorDTO.Key);
 

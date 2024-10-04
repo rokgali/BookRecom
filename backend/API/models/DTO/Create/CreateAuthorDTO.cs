@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace backend.models.dto.RequestArgs 
+namespace backend.models.dto.Create 
 {  
-    public record AuthorDTO
+    public record CreateAuthorDTO
     {
         public required string Name { get; set; }
         public required string Key { get; set; }

@@ -2,9 +2,8 @@ using System.Net.Security;
 using System.Text.Json;
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.RequestArgs;
-using backend.models.dto.ResponseArgs;
-using backend.models.dto.TakeawayResponseDTO;
+using backend.models.dto.Create;
+using backend.models.dto.Response;
 using backend.persistence;
 using backend.services;
 using backend.services.gemini;
@@ -56,7 +55,7 @@ namespace backend.controllers
         [HttpGet]
         public async Task<IActionResult> GetBookTakeaways(int numberOfTakeaways, string workId, string title, string authorName, CancellationToken ct)
         {
-            TakeawayResponseDTO takeawaysResponse;
+            IEnumerable<TakeawayResponseDTO> takeawaysResponse;
 
             if(numberOfTakeaways < 0 || numberOfTakeaways > 5)
                 return BadRequest("The number of takeaways must be between 0 and 5");
@@ -67,20 +66,29 @@ namespace backend.controllers
             {
                 var generatedTakeaways = await _bookService.GetBookTakeaways(numberOfTakeaways, title, authorName, ct);
 
-                takeawaysResponse = JsonSerializer.Deserialize<TakeawayResponseDTO>(generatedTakeaways, 
+                _logger.Log(LogLevel.Information, generatedTakeaways);
+
+                // Step 1: Parse the full JSON document
+                using var document = JsonDocument.Parse(generatedTakeaways);
+
+                // Step 2: Extract the "takeaways" array as raw JSON
+                var takeawaysElement = document.RootElement.GetProperty("takeaways");
+                var takeawaysHeadingElement = document.RootElement.GetProperty("heading");
+                var takeawaysJson = takeawaysElement.GetRawText();
+
+                takeawaysResponse = JsonSerializer.Deserialize<IEnumerable<TakeawayResponseDTO>>(takeawaysJson, 
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
                 return Ok(takeawaysResponse);
             }
 
-            ICollection<TakeawayDTO> takeawaysDTO = _mapper.Map<ICollection<TakeawayDTO>>(foundBook.Takeaways);
-            takeawaysResponse = new TakeawayResponseDTO(foundBook.TakeawaysHeading, takeawaysDTO);
+            var takeawaysDTO = _mapper.Map<ICollection<TakeawayResponseDTO>>(foundBook.Takeaways);
 
-            return Ok(takeawaysResponse);
+            return Ok(takeawaysDTO);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBook(BookDTO bookDTO)
+        public async Task<IActionResult> CreateBook(CreateBookDTO bookDTO)
         {
             var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
 
@@ -91,11 +99,6 @@ namespace backend.controllers
                 return BadRequest("Takeaways can't be empty");
 
             Book newBook = _mapper.Map<Book>(bookDTO);
-            ICollection<Takeaway>takeAways = _mapper.Map<ICollection<Takeaway>>(bookDTO.Takeaways.takeaways);
-            newBook.Takeaways = takeAways;
-            Author newAuthor = _mapper.Map<Author>(bookDTO.Author);
-
-            newBook.Author = newAuthor;
 
             int addBookToDbResult = await _bookService.AddBookToDb(newBook);
 
@@ -105,6 +108,15 @@ namespace backend.controllers
 
 
             return Ok("Book succesfully added to");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCachedBooks(int offset, int pageSize)
+        {
+            IQueryable<Book> books = _context.Books.Include(b => b.Takeaways).Include(backend => backend.Author).Skip((offset - 1) * pageSize).Take(pageSize);
+            var booksResponse = _mapper.Map<IEnumerable<BookResponseDTO>>(books);
+
+            return Ok(booksResponse);
         }
     }
 }

@@ -1,6 +1,4 @@
-using backend.models.dto.ResponseArgs;
-
-namespace backend.models.dto.TakeawayResponseDTO
+namespace backend.models.dto.Response 
 {
-    public record TakeawayResponseDTO(string heading, ICollection<TakeawayDTO> takeaways);
-} 
+    public record TakeawayResponseDTO(string Name, string Lesson, string Episode);
+}

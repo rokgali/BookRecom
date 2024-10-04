@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace backend.models.dto.RequestArgs {
-    public record RegisterDTO {
+namespace backend.models.dto.Create {
+    public record CreateAccountDTO {
         [EmailAddress(ErrorMessage = "Invalid Email address")]
         [MaxLength(254)]
         [DisallowNull]

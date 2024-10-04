@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.RequestArgs;
+using backend.models.dto.Create;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ namespace backend.controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO) {
+        public async Task<IActionResult> RegisterUser(CreateAccountDTO registerDTO) {
             var userAlreadyExists = await _userManager.Users.AnyAsync(u => u.Email == registerDTO.Email);
 
             if(userAlreadyExists)

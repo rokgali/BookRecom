@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using backend.models.database;
-using backend.models.dto.ResponseArgs;
 using backend.models.gemini.response;
 using backend.persistence;
 using backend.services.gemini;
@@ -86,7 +85,7 @@ namespace backend.services.book {
 
             string initialPrompt = $"Give me {numberOfTakeaways} key " +
                                     $"takeaways from '{title}' " + 
-                                    $"by {authorName}. Do not add any other text besides the json";
+                                    $"by {authorName}. Do not add any other text besides the json.";
 
             try {
                 string response = await _geminiClient.GenerateContentAsync(initialPrompt, "tunedModels/main-book-takeaways-au2dj9bfx11d:generateContent", ct);

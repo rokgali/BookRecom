@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.models.database;
-using backend.models.dto.ResponseArgs;
+using backend.models.dto.Create;
+using backend.models.dto.Response;
 
 namespace backend.profilers 
 {
@@ -8,7 +9,7 @@ namespace backend.profilers
     {
         public TakeawayDTOProfile()
         {
-            CreateMap<Takeaway, TakeawayDTO>()
+            CreateMap<Takeaway, TakeawayResponseDTO>()
             .ForMember(dest => dest.Episode,
             src => src.MapFrom(s => s.Episode))
             .ForMember(dest => dest.Lesson, 
@@ -16,7 +17,7 @@ namespace backend.profilers
             .ForMember(dest => dest.Name,
             src => src.MapFrom(s => s.Name));
 
-            CreateMap<TakeawayDTO, Takeaway>()
+            CreateMap<CreateTakeawayDTO, Takeaway>()
             .ForMember(dest => dest.Episode,
             src => src.MapFrom(s => s.Episode))
             .ForMember(dest => dest.Lesson, 

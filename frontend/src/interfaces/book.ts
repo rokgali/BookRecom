@@ -48,11 +48,18 @@ interface Author {
     key: string
 }
 
+export interface Takeaway {
+    name: string,
+    lesson: string,
+    episode: string
+}
+
 export interface PostBook {
     title: string,
     workId: string,
     coverId: number,
     author: Author,
+    takeawaysHeading: string,
     description: string,
-    takeaways: TakeawaysResponse
+    takeaways: Takeaway[]
 }
