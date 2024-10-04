@@ -43,14 +43,16 @@ export default function HomePage(props: HomePageProps)
     }, [])
 
     useEffect(() => {
-        axios.get(`${OpenLibraryUrl}/search.json?author=%22${authorName}%22&limit=23`)
+        axios.get(`${OpenLibraryUrl}/search.json?author=%22${authorName}%22&limit=23&language=eng`)
         .then(res => {
             const bookSearchResult: OpenLibraryBookSearchResult = res.data
             
+            console.log(bookSearchResult);
             setSearchBooks(bookSearchResult);
             setBookSearchLoading(false);
         })
         .catch(err => {
+            console.error(err);
             setBookSearchErrorMessage('Books failed to load, check input parameters');
             setBookSearchLoading(false);
         })

@@ -15,6 +15,7 @@ export default function BookPage()
     const [bookDescriptionAndTakeawaysLoading, setBookDescriptionAndTakeawaysLoading] = useState<boolean>(true);
     const [bookDescription, setBookDescription] = useState<string>('');
     const [bookTakeaways, setBookTakeaways] = useState<TakeawaysResponse>({heading:'', takeaways:[]});
+    const [saveBookToDbFlag, setSaveToDbFlag] = useState<boolean>(false);
 
     const [bookDescriptionError, setBookDescriptionError] = useState<string>(); 
     const [bookTakeawaysError, setBookTakeawaysError] = useState<string>();
@@ -24,35 +25,44 @@ export default function BookPage()
         const FetchBookDescriptionAndTakeaways = async () => {
                 const getBookDescriptionRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookDescription?workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
                                                        .then(res => setBookDescription(res.data))
-                                                       .catch(err => {setBookDescriptionError("Book description failed to load"); setFailedToLoad(true); console.error(err)});
+                                                       .catch(err => {setBookDescriptionError("Book description failed to load"); setFailedToLoad(true);});
 
                 const getBookTakeawaysRequest = axios.get(`${BookrecomAPIUrl}/Book/GetBookTakeaways?numberOfTakeaways=5&workId=${pageProps.workId}&title=${pageProps.title}&authorName=${pageProps.authorName}`)
-                                                     .then(res => { setBookTakeaways(res.data); console.log(res.data) })
-                                                     .catch(err => {setBookTakeawaysError("Book takeaways failed to load"); setFailedToLoad(true)});
+                                                     .then(res => { setBookTakeaways(res.data);})
+                                                     .catch(err => {setBookTakeawaysError("Book takeaways failed to load"); setFailedToLoad(true);});
 
             try {
                 await Promise.all([getBookDescriptionRequest, getBookTakeawaysRequest]);
 
                 setBookDescriptionAndTakeawaysLoading(false);
+                setSaveToDbFlag(true);
             } catch (err) {
 
             }
         }
 
         FetchBookDescriptionAndTakeaways();
+    }, [])
+
+    useEffect(() => {
+        if(!saveBookToDbFlag)
+            return; 
 
         const bookToSave:PostBook = {title:pageProps.title, workId:pageProps.workId, coverId:pageProps.coverId,
             author: {name: pageProps.authorName, key: pageProps.authorKey}, 
             description:bookDescription, takeaways:bookTakeaways}
 
-        // SaveBookToDb(bookToSave);
-    }, [])
+        SaveBookToDb(bookToSave);
+
+    }, [saveBookToDbFlag])
 
     function SaveBookToDb(bookToSave: PostBook)
     {
+        console.log(bookToSave);
+
         axios.post(`${BookrecomAPIUrl}/Book/CreateBook`, bookToSave)
-        .then(res => {console.log(res.data)})
-        .catch(err => console.error(err));
+        .then(res => {})
+        .catch(err => {}); 
     }
 
     return (

@@ -56,6 +56,8 @@ namespace backend.controllers
         [HttpGet]
         public async Task<IActionResult> GetBookTakeaways(int numberOfTakeaways, string workId, string title, string authorName, CancellationToken ct)
         {
+            TakeawayResponseDTO takeawaysResponse;
+
             if(numberOfTakeaways < 0 || numberOfTakeaways > 5)
                 return BadRequest("The number of takeaways must be between 0 and 5");
 
@@ -65,13 +67,16 @@ namespace backend.controllers
             {
                 var generatedTakeaways = await _bookService.GetBookTakeaways(numberOfTakeaways, title, authorName, ct);
 
-                TakeawayResponseDTO takeaways = JsonSerializer.Deserialize<TakeawayResponseDTO>(generatedTakeaways, 
+                takeawaysResponse = JsonSerializer.Deserialize<TakeawayResponseDTO>(generatedTakeaways, 
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
 
-                return Ok(takeaways);
+                return Ok(takeawaysResponse);
             }
 
-            return Ok(foundBook.Takeaways);
+            ICollection<TakeawayDTO> takeawaysDTO = _mapper.Map<ICollection<TakeawayDTO>>(foundBook.Takeaways);
+            takeawaysResponse = new TakeawayResponseDTO(foundBook.TakeawaysHeading, takeawaysDTO);
+
+            return Ok(takeawaysResponse);
         }
 
         [HttpPost]
@@ -80,10 +85,16 @@ namespace backend.controllers
             var bookInLibraryExists = await _context.Books.Where(b => b.WorkId == bookDTO.WorkId).AnyAsync();
 
             if(bookInLibraryExists)
-                return Conflict(new { message = "A book with this WorkId already exists in the database" });
+                return Ok(new { message = "A book with this WorkId already exists in the database" });
+
+            if(bookDTO.Takeaways == null)
+                return BadRequest("Takeaways can't be empty");
 
             Book newBook = _mapper.Map<Book>(bookDTO);
+            ICollection<Takeaway>takeAways = _mapper.Map<ICollection<Takeaway>>(bookDTO.Takeaways.takeaways);
+            newBook.Takeaways = takeAways;
             Author newAuthor = _mapper.Map<Author>(bookDTO.Author);
+
             newBook.Author = newAuthor;
 
             int addBookToDbResult = await _bookService.AddBookToDb(newBook);
