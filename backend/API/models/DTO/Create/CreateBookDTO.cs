@@ -16,6 +16,6 @@ namespace backend.models.dto.Create {
         [AllowNull]
         public string? Description { get; init; }
         [DisallowNull]
-        public required CreateTakeawaysDTO Takeaways {get;init;}
+        public required ICollection<CreateTakeawayDTO> Takeaways {get;init;}
     }
 }

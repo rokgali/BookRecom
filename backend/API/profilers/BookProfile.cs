@@ -23,9 +23,9 @@ namespace backend.profilers
             .ForMember(dest => dest.BookRecommendationIds,
             src => src.Ignore())
             .ForMember(dest => dest.Takeaways,
-            src => src.Ignore())
+            src => src.MapFrom(x => x.Takeaways))
             .ForMember(dest => dest.TakeawaysHeading,
-            src => src.Ignore());
+            src => src.MapFrom(x => x.TakeawaysHeading));
 
             CreateMap<Book, BookResponseDTO>()
             .ForMember(dest => dest.Title,

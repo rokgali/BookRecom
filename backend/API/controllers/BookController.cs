@@ -68,12 +68,10 @@ namespace backend.controllers
 
                 _logger.Log(LogLevel.Information, generatedTakeaways);
 
-                // Step 1: Parse the full JSON document
                 using var document = JsonDocument.Parse(generatedTakeaways);
 
-                // Step 2: Extract the "takeaways" array as raw JSON
                 var takeawaysElement = document.RootElement.GetProperty("takeaways");
-                var takeawaysHeadingElement = document.RootElement.GetProperty("heading");
+                // var takeawaysHeadingElement = document.RootElement.GetProperty("heading");
                 var takeawaysJson = takeawaysElement.GetRawText();
 
                 takeawaysResponse = JsonSerializer.Deserialize<IEnumerable<TakeawayResponseDTO>>(takeawaysJson, 

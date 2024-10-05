@@ -14,7 +14,7 @@ export default function BookPage()
 
     const [bookDescriptionAndTakeawaysLoading, setBookDescriptionAndTakeawaysLoading] = useState<boolean>(true);
     const [bookDescription, setBookDescription] = useState<string>('');
-    const [bookTakeaways, setBookTakeaways] = useState<TakeawaysResponse>({heading:'', takeaways:[]});
+    const [bookTakeaways, setBookTakeaways] = useState<Takeaway[]>([]);
     const [saveBookToDbFlag, setSaveToDbFlag] = useState<boolean>(false);
 
     const [bookDescriptionError, setBookDescriptionError] = useState<string>(); 
@@ -49,8 +49,8 @@ export default function BookPage()
             return; 
 
         const bookToSave:PostBook = {title:pageProps.title, workId:pageProps.workId, coverId:pageProps.coverId,
-            author: {name: pageProps.authorName, key: pageProps.authorKey}, 
-            description:bookDescription, takeaways:bookTakeaways}
+                                     author: {name: pageProps.authorName, key: pageProps.authorKey}, takeawaysHeading:'',
+                                     description:bookDescription, takeaways:bookTakeaways};
 
         SaveBookToDb(bookToSave);
 
@@ -87,7 +87,7 @@ export default function BookPage()
                         </div>
                         <div className="mt-4">
                             <ul className="space-y-4">
-                                {bookTakeaways && bookTakeaways?.takeaways.map((takeaway, index) => (
+                                {bookTakeaways && bookTakeaways.map((takeaway, index) => (
                                     <li key={index}>
                                         <div>takeaway number: {index + 1}</div>
 
