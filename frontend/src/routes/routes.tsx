@@ -8,6 +8,7 @@ import BookPage from "../pages/book";
 import AuthorSearchResultTable from "../components/author_search_result";
 import AuthorEditing from "../pages/author_editing";
 import { useState } from "react";
+import CachedBooks from "../pages/cached_books";
 
 interface RoutesProps {
     userIsAuthenticated: boolean,
@@ -17,12 +18,6 @@ interface RoutesProps {
 export default function Routes(props: RoutesProps)
 {
     const loginPath: string = "login"
-    const [loading, setLoading] = useState<boolean>(false);
-
-    function SetPageIsLoading(isLoading: boolean)
-    {
-        setLoading(isLoading);
-    }
 
     const routes: RouteObject[] = [
         { path: loginPath, element: <LoginPage /> },
@@ -45,6 +40,11 @@ export default function Routes(props: RoutesProps)
                 },
                 {
                     path: "/author_editing", element: <AuthComponent successfulLoginComponent={<AuthorEditing />} 
+                    loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated} requiredRoles={ [] }
+                    userRoles={props.userRoles} />
+                },
+                {
+                    path:"/cached_books", element: <AuthComponent successfulLoginComponent={<CachedBooks />} 
                     loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated} requiredRoles={ [] }
                     userRoles={props.userRoles} />
                 }

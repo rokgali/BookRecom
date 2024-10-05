@@ -47,12 +47,10 @@ export default function HomePage(props: HomePageProps)
         .then(res => {
             const bookSearchResult: OpenLibraryBookSearchResult = res.data
             
-            console.log(bookSearchResult);
             setSearchBooks(bookSearchResult);
             setBookSearchLoading(false);
         })
         .catch(err => {
-            console.error(err);
             setBookSearchErrorMessage('Books failed to load, check input parameters');
             setBookSearchLoading(false);
         })

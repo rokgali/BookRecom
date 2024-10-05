@@ -11,6 +11,7 @@ using backend.services.jobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.SemanticKernel;
 
 namespace backend.controllers
 {
@@ -24,10 +25,11 @@ namespace backend.controllers
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        private readonly Kernel _kernel;
         private readonly ILogger<BookController> _logger;
         public BookController(IGeminiClient geminiClient, BookRecomDbContext context, 
                               IMapper mapper, IBookService bookService, IBackgroundTaskQueue backgroundTaskQueue,
-                              ILogger<BookController> logger)
+                              ILogger<BookController> logger, Kernel kernel)
         {
             _geminiClient = geminiClient;
             _context = context;
@@ -35,6 +37,7 @@ namespace backend.controllers
             _bookService = bookService;
             _backgroundTaskQueue = backgroundTaskQueue;
             _logger = logger;
+            _kernel = kernel;
         }
 
         [HttpGet]
@@ -115,6 +118,25 @@ namespace backend.controllers
             var booksResponse = _mapper.Map<IEnumerable<BookResponseDTO>>(books);
 
             return Ok(booksResponse);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBookTakeawaysSemanticKernel(int numberOfTakeaways, string title, string authorName, CancellationToken ct)
+        {
+            string initialPrompt = $"Give me {numberOfTakeaways} key " +
+                                    $"takeaways from '{title}' " + 
+                                    $"by {authorName}. Do not add any other text besides the json.";
+
+            var executionSettings = new PromptExecutionSettings();
+            #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            // executionSettings.ServiceId = "takeaways";
+            executionSettings.ServiceId = "description";
+            #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+            var request = _kernel.CreateFunctionFromPrompt(initialPrompt, executionSettings);
+            var result = await _kernel.InvokeAsync(request);
+
+            return Ok(result.ToString());
         }
     }
 }

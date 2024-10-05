@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { NavigationPage } from "../../interfaces/navigation_page";
 import ExpandableSidenav from "./expandable_sidenav";
 import TopNavigation from "./top_navigation";
-import { Home, Settings, User, Mail, ChevronFirst, ChevronLast, MoreHorizontal } from "lucide-react"
+import { Home, Settings, User, PersonStandingIcon, Book, ChevronFirst, ChevronLast, MoreHorizontal } from "lucide-react"
 interface LayoutProps {
 }
 
@@ -10,7 +10,8 @@ export default function Layout(props: LayoutProps)
 {
     const navigations: NavigationPage[] = 
     [{icon: Home, name: 'Home', link: '/'}, 
-    {icon: Settings, name: 'Edit Authors', link: '/author_editing'}]
+    {icon: PersonStandingIcon, name: 'Edit Authors', link: '/author_editing'},
+    {icon: Book, name: 'Saved books', link: '/cached_books'}]
 
     return (
         <>

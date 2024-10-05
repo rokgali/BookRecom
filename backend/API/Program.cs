@@ -6,9 +6,13 @@ using backend.services.gemini;
 using backend.services;
 using backend.services.book;
 using backend.services.jobs;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.Google;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("myserverconnection");
+var apiKey = builder.Configuration["Gemini:ApiKey"];
 
 builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole<int>>()
@@ -23,6 +27,32 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Semantic kernel for Gemini AI
+
+var kernelBuiler = Kernel.CreateBuilder();
+
+#pragma warning disable SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+kernelBuiler.AddGoogleAIGeminiChatCompletion(
+    modelId:"gemini-1.5-flash",
+    apiKey:apiKey,
+    serviceId:"description"
+);
+#pragma warning restore SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+#pragma warning disable SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+kernelBuiler.AddGoogleAIGeminiChatCompletion(
+    modelId:"tunedModels/main-book-takeaways-au2dj9bfx11d:generateContent",
+    apiKey:apiKey,
+    serviceId:"takeaways"
+);
+#pragma warning restore SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+var kernel = kernelBuiler.Build();
+
+builder.Services.AddSingleton<Kernel>(kernel);
+
+// ----------------------------
+
 builder.Services.AddAuthentication()
     .AddBearerToken(IdentityConstants.BearerScheme);
 
@@ -34,6 +64,8 @@ builder.Services.Configure<IdentityOptions>(options => {
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
 });
+
+
 
 builder.Services.AddCors(options =>
 {

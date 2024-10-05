@@ -51,15 +51,12 @@ export default function BookPage()
         const bookToSave:PostBook = {title:pageProps.title, workId:pageProps.workId, coverId:pageProps.coverId,
                                      author: {name: pageProps.authorName, key: pageProps.authorKey}, takeawaysHeading:'',
                                      description:bookDescription, takeaways:bookTakeaways};
-
         SaveBookToDb(bookToSave);
 
     }, [saveBookToDbFlag])
 
     function SaveBookToDb(bookToSave: PostBook)
     {
-        console.log(bookToSave);
-
         axios.post(`${BookrecomAPIUrl}/Book/CreateBook`, bookToSave)
         .then(res => {})
         .catch(err => {}); 
