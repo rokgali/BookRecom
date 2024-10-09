@@ -6,14 +6,15 @@ import { GetBook } from "../interfaces/book";
 import { useNavigate } from "react-router-dom";
 import { BookPageProps } from "../interfaces/bookpageprops";
 import Loading from "../components/loading";
-import { BookrecomAPIUrl, OpenLibraryCoversUlr, OpenLibraryUrl } from "../components/globals/ulrs";
+import { BookrecomAPIUrl, OpenLibraryCoversUlr, OpenLibraryUrl } from "../globals/ulrs";
 
 interface HomePageProps {
 }
 
 interface Author {
     id: number,
-    name: string
+    name: string,
+    key: string
 }
 
 export default function HomePage(props: HomePageProps)

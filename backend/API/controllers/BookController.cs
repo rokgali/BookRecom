@@ -96,10 +96,16 @@ namespace backend.controllers
             if(bookInLibraryExists)
                 return Ok(new { message = "A book with this WorkId already exists in the database" });
 
+            var author = await _context.Authors.FirstOrDefaultAsync(author => author.Key == bookDTO.AuthorKey);
+
+            if(author == null)
+                return BadRequest("Author with the provided key doesn't exist");
+
             if(bookDTO.Takeaways == null)
                 return BadRequest("Takeaways can't be empty");
 
             Book newBook = _mapper.Map<Book>(bookDTO);
+            newBook.Author = author;
 
             int addBookToDbResult = await _bookService.AddBookToDb(newBook);
 

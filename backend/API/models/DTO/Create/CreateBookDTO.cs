@@ -12,7 +12,7 @@ namespace backend.models.dto.Create {
         public int CoverId { get; init; }
         public string? TakeawaysHeading {get;set;}
         [DisallowNull]
-        public required CreateAuthorDTO Author {get;init;}
+        public required string AuthorKey {get;set;}
         [AllowNull]
         public string? Description { get; init; }
         [DisallowNull]

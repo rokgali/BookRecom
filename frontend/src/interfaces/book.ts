@@ -58,7 +58,7 @@ export interface PostBook {
     title: string,
     workId: string,
     coverId: number,
-    author: Author,
+    authorKey: string,
     takeawaysHeading: string,
     description: string,
     takeaways: Takeaway[]

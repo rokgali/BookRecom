@@ -9,6 +9,7 @@ import AuthorSearchResultTable from "../components/author_search_result";
 import AuthorEditing from "../pages/author_editing";
 import { useState } from "react";
 import CachedBooks from "../pages/cached_books";
+import BooksByAuthorKey from "../pages/books_by_author_key";
 
 interface RoutesProps {
     userIsAuthenticated: boolean,
@@ -45,6 +46,11 @@ export default function Routes(props: RoutesProps)
                 },
                 {
                     path:"/cached_books", element: <AuthComponent successfulLoginComponent={<CachedBooks />} 
+                    loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated} requiredRoles={ [] }
+                    userRoles={props.userRoles} />
+                },
+                {
+                    path:"/book_by_author_key", element: <AuthComponent successfulLoginComponent={<BooksByAuthorKey />} 
                     loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated} requiredRoles={ [] }
                     userRoles={props.userRoles} />
                 }

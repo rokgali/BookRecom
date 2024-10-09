@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BookrecomAPIUrl } from "../components/globals/ulrs";
+import { BookrecomAPIUrl } from "../globals/ulrs";
 
 
 export default function CachedBooks()

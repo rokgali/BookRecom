@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import OpenLibraryAuthorSearchResult from "../interfaces/openlibrary_author_search_results";
 import axios from "axios";
 import Loading from "./loading";
-import { BookrecomAPIUrl, OpenLibraryUrl } from "./globals/ulrs";
+import { BookrecomAPIUrl, OpenLibraryUrl } from "../globals/ulrs";
 import OperationSuccess from "./notifications/operation_success";
 import OperationFailure from "./notifications/operation_failure";
 

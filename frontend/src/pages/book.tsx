@@ -4,7 +4,7 @@ import { BookPageProps } from "../interfaces/bookpageprops";
 import TakeawaysResponse, { Takeaway } from "../interfaces/takeawaysResponse";
 import axios from 'axios';
 import Loading from "../components/loading";
-import { BookrecomAPIUrl } from "../components/globals/ulrs";
+import { BookrecomAPIUrl } from "../globals/ulrs";
 import { PostBook } from "../interfaces/book";
 
 export default function BookPage()
@@ -49,7 +49,7 @@ export default function BookPage()
             return; 
 
         const bookToSave:PostBook = {title:pageProps.title, workId:pageProps.workId, coverId:pageProps.coverId,
-                                     author: {name: pageProps.authorName, key: pageProps.authorKey}, takeawaysHeading:'',
+                                     authorKey: pageProps.authorKey, takeawaysHeading:'',
                                      description:bookDescription, takeaways:bookTakeaways};
         SaveBookToDb(bookToSave);
 
@@ -58,8 +58,8 @@ export default function BookPage()
     function SaveBookToDb(bookToSave: PostBook)
     {
         axios.post(`${BookrecomAPIUrl}/Book/CreateBook`, bookToSave)
-        .then(res => {})
-        .catch(err => {}); 
+        .then(res => {console.log(res)})
+        .catch(err => {console.log(err)}); 
     }
 
     return (

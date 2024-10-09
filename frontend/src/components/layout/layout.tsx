@@ -11,7 +11,8 @@ export default function Layout(props: LayoutProps)
     const navigations: NavigationPage[] = 
     [{icon: Home, name: 'Home', link: '/'}, 
     {icon: PersonStandingIcon, name: 'Edit Authors', link: '/author_editing'},
-    {icon: Book, name: 'Saved books', link: '/cached_books'}]
+    {icon: Book, name: 'Saved books', link: '/cached_books'},
+    {icon: Settings, name: 'Books by author key', link: '/book_by_author_key'}]
 
     return (
         <>
