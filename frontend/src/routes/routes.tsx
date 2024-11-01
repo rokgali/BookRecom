@@ -9,7 +9,7 @@ import AuthorSearchResultTable from "../components/author_search_result";
 import AuthorEditing from "../pages/author_editing";
 import { useState } from "react";
 import CachedBooks from "../pages/cached_books";
-import BooksByAuthorKey from "../pages/books_by_author_key";
+import BooksByAuthorKey from "../pages/home";
 
 interface RoutesProps {
     userIsAuthenticated: boolean,
@@ -27,12 +27,13 @@ export default function Routes(props: RoutesProps)
             path: "/",
             element: <Layout />,
             children: [
-                { index: true, element: <AuthComponent 
-                    successfulLoginComponent={<HomePage />}
-                    loginPath={loginPath}
-                    userIsAuthenticated={props.userIsAuthenticated}
-                    requiredRoles={ [] }
-                    userRoles={props.userRoles} /> },
+                // { index: true, element: <AuthComponent 
+                //     successfulLoginComponent={<HomePage />}
+                //     loginPath={loginPath}
+                //     userIsAuthenticated={props.userIsAuthenticated}
+                //     requiredRoles={ [] }
+                //     userRoles={props.userRoles} /> 
+                // },
                 {
                     path: "/book", element: <AuthComponent successfulLoginComponent={<BookPage />} 
                     loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated}
@@ -50,7 +51,7 @@ export default function Routes(props: RoutesProps)
                     userRoles={props.userRoles} />
                 },
                 {
-                    path:"/book_by_author_key", element: <AuthComponent successfulLoginComponent={<BooksByAuthorKey />} 
+                    index: true, element: <AuthComponent successfulLoginComponent={<BooksByAuthorKey />} 
                     loginPath={loginPath} userIsAuthenticated={props.userIsAuthenticated} requiredRoles={ [] }
                     userRoles={props.userRoles} />
                 }

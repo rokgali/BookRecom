@@ -7,10 +7,5 @@ namespace backend.controllers
     [Route("api/[controller]/[action]")]
     public class UserController : ControllerBase
     {
-        private readonly IGeminiClient _geminiClient;
-        public UserController(IGeminiClient geminiClient)
-        {
-            _geminiClient = geminiClient;
-        }
     }
 }

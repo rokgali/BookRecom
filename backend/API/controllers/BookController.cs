@@ -20,14 +20,14 @@ namespace backend.controllers
     [Route("api/[controller]/[action]")]
     public class BookController : ControllerBase
     {
-        private readonly IGeminiClient _geminiClient;
+        private readonly IAiClient _geminiClient;
         private readonly BookRecomDbContext _context;
         private readonly IMapper _mapper;
         private readonly IBookService _bookService;
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly Kernel _kernel;
         private readonly ILogger<BookController> _logger;
-        public BookController(IGeminiClient geminiClient, BookRecomDbContext context, 
+        public BookController(IAiClient geminiClient, BookRecomDbContext context, 
                               IMapper mapper, IBookService bookService, IBackgroundTaskQueue backgroundTaskQueue,
                               ILogger<BookController> logger, Kernel kernel)
         {

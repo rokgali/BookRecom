@@ -6,14 +6,14 @@ using System.Text.Unicode;
 
 namespace backend.services.gemini
 {
-    internal sealed class GeminiClient : IGeminiClient
+    internal sealed class GeminiClient : IAiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<GeminiClient> _logger;
+        private readonly ILogger<IAiClient> _logger;
         private readonly IConfiguration _configuration;
         private readonly IGeminiRequestFactory _geminiRequestFactory;
 
-        public GeminiClient(HttpClient httpClient, ILogger<GeminiClient> logger, IConfiguration configuration, IGeminiRequestFactory geminiRequestFactory)
+        public GeminiClient(HttpClient httpClient, ILogger<IAiClient> logger, IConfiguration configuration, IGeminiRequestFactory geminiRequestFactory)
         {
             _httpClient = httpClient;
             _logger = logger;

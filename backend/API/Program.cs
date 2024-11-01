@@ -77,8 +77,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddTransient<IGeminiClient, GeminiClient>();
+builder.Services.AddTransient<IAiClient, GeminiClient>();
 builder.Services.AddHttpClient<GeminiClient>();
+
+builder.Services.AddTransient<AiClientFactory>();
+builder.Services.AddTransient<IAiClientManager, AiClientManager>();
 
 builder.Services.AddTransient<IGeminiRequestFactory, GeminiRequestFactory>();
 
